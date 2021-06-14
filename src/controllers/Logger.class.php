@@ -1,4 +1,12 @@
 <?php
+/**
+ * Controlador de logs do sistema.
+ * 
+ * @author    Felipe Menezes <contato@felipemenezes.com.br>
+ * @copyright (c) 2021 Felipe Menezes
+ * @package   Wallet_Backend
+ * @version   1.0.0
+ */
 
 class Logger {
 	/**
@@ -8,7 +16,7 @@ class Logger {
 	const LOG_WARNING = 2;
 	const LOG_INFO = 3;
 	const LOG_TYPES = array( 1 => "ERROR", 2 => "WARNING", 3 => "INFO" );
-	
+
 	/**
 	 * Contador de tempo de execução das instruções.
 	 * @access private
