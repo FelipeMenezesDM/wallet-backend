@@ -8,6 +8,8 @@
  * @version   1.0.0
  */
 
+namespace Src\Controllers;
+
 class Logger {
 	/**
 	 * Constantes de identificação de tipos de mensagem no console.

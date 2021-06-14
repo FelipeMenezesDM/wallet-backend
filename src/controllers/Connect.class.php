@@ -8,6 +8,8 @@
  * @version   1.0.0
  */
 
+namespace Src\Controllers;
+
 class Connect {
 	/**
 	 * Lista constante de SGBDs compatíveis.
