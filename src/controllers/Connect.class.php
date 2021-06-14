@@ -214,6 +214,30 @@ class Connect {
 	}
 
 	/**
+	 * Obter o tipo de instrução da DML (SELECT, UPDATE, DELETE OU INSERT).
+	 * @param  string $sql Intrução para verificação.
+	 * @return string
+	 */
+	public static function getStatementType( $sql ) {
+		if( is_array( $sql ) )
+			$sql = array_pop( $sql );
+
+		$sql = strtoupper( $sql );
+		$dml = explode( " ", trim( trim( trim( trim( $sql ), "(" ), ")" ) ) )[0];
+
+		if( $dml == "WITH" ) {
+			return "SELECT";
+		}elseif( $dml == "MERGE" ) {
+			if( strrpos( $sql, "INSERT" ) )
+				return "INSERT";
+			else
+				return "UPDATE";
+		}
+
+		return $dml;
+	}
+
+	/**
 	 * Iniciar transação.
 	 */
 	public function beginTransaction() {

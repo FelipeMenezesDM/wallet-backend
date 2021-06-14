@@ -28,8 +28,9 @@ class Logger {
 
 	/**
 	 * Criar e exibir mensagem de erro no log do servidor.
-	 * @param string $msg       Mensagem para exibição.
-	 * @param string $serverMsg Mensagem reservada do servidor.
+	 * @param  string $msg       Mensagem para exibição.
+	 * @param  string $serverMsg Mensagem reservada do servidor.
+	 * @return void
 	 */
 	public static function setDisplayMessage( $msg = "", $serverMsg = null ) {
 		$backTrace = array_reverse( debug_backtrace() )[0];
