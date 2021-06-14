@@ -251,9 +251,9 @@ class Connect {
 
 		try {
 			$this->connection = new \PDO( $this->getDBDriver()->getDNS( $this->host, $this->port, $this->database ), $this->user, $this->password );
-			$this->connection->setAttribute( PDO::ATTR_CASE, PDO::CASE_LOWER );
+			$this->connection->setAttribute( \PDO::ATTR_CASE, \PDO::CASE_LOWER );
 			$this->getDBDriver()->connectionSettings( $this->connection );
-			$this->getDBDriver()->setDBVersion( $this->connection->getAttribute( PDO::ATTR_SERVER_VERSION ) );
+			$this->getDBDriver()->setDBVersion( $this->connection->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
 		}catch( Exception $e ) {
 			$this->connection = null;
 			Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
