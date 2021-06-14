@@ -151,7 +151,7 @@ class Connect {
 		# Definir gerenciador apenas quando este não houver sido definido anteriormente.
 		if( is_null( self::$manager ) ) {
 			$manager = strtolower( trim( $manager ) );
-			$driver = "Driver${manager}";
+			$driver = "Src\Drivers\Driver${manager}";
 
 			# Verificar se o gerenciador foi definido.
 			if( empty( $manager ) )
@@ -167,6 +167,14 @@ class Connect {
 		}else{
 			Logger::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
 		}
+	}
+
+	/**
+	 * Obter o driver do gerenciador.
+	 * @return object
+	 */
+	public function getDBDriver() {
+		return self::$driver;
 	}
 
 	/**
@@ -242,7 +250,7 @@ class Connect {
 			Logger::setDisplayMessage( gettext( "As credenciais de conexão com a base de dados precisam ser definidas." ) );
 
 		try {
-			$this->connection = new PDO( $this->getDBDriver()->getDNS( $this->host, $this->port, $this->database ), $this->user, $this->password );
+			$this->connection = new \PDO( $this->getDBDriver()->getDNS( $this->host, $this->port, $this->database ), $this->user, $this->password );
 			$this->connection->setAttribute( PDO::ATTR_CASE, PDO::CASE_LOWER );
 			$this->getDBDriver()->connectionSettings( $this->connection );
 			$this->getDBDriver()->setDBVersion( $this->connection->getAttribute( PDO::ATTR_SERVER_VERSION ) );
