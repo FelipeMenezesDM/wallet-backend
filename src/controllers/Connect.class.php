@@ -92,13 +92,6 @@ class Connect {
 	private $error = false;
 
 	/**
-	 * Contador de tempo de execução das instruções.
-	 * @access private
-	 * @var    integer
-	 */
-	private $execTimeCounter = 0;
-
-	/**
 	 * Método construtor para objeto de conexão com bases de dados.
 	 * @param  string $database Banco de dados padrão da conexão.
 	 * @param  string $user     Usuário da base de dados/instância.
@@ -160,17 +153,17 @@ class Connect {
 
 			# Verificar se o gerenciador foi definido.
 			if( empty( $manager ) )
-				self::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
+				Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
 
 			# Definir driver do gerenciador.
 			if( !in_array( $manager, self::DRIVERS ) || !class_exists( $driver ) )
-				self::setDisplayMessage( gettext( "O gerenciador de base de dados definido não é suportado." ) );
+				logger::setDisplayMessage( gettext( "O gerenciador de base de dados definido não é suportado." ) );
 			else
 				self::$driver = new $driver();
 
 			self::$manager = $manager;
 		}else{
-			self::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
+			Logger::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
 		}
 	}
 
@@ -180,5 +173,88 @@ class Connect {
 	 */
 	public function getManager() {
 		return self::$manager;
+	}
+
+	/**
+	 * Definir schema padrão para a conexão.
+	 * @param  string $schema Nome do schema padrão.
+	 * @return void
+	 */
+	public function setSchema( $schema = "" ) {
+		if( empty( trim( $schema ) ) )
+			$schema = $this->database;
+
+		$this->schema = trim( $schema );
+	}
+
+	/**
+	 * Obter schema padrão.
+	 * @return string
+	 */
+	public function getSchema() {
+		return $this->schema;
+	}
+
+	/**
+	 * Obter base de dados padrão.
+	 * @return string
+	 */
+	public function getDB() {
+		return $this->database;
+	}
+
+	/**
+	 * Iniciar transação.
+	 */
+	public function beginTransaction() {
+		if( !is_null( $this->connection ) )
+			$this->connection->beginTransaction();
+	}
+
+	/**
+	 * Comitar transação.
+	 * @return void
+	 */
+	public function commit() {
+		if( !is_null( $this->connection ) )
+			$this->connection->commit();
+	}
+
+	/**
+	 * Finalizar transação sem efetivar alterações.
+	 * @return void
+	 */
+	public function rollBack() {
+		if( !is_null( $this->connection ) )
+			$this->connection->rollBack();
+	}
+
+	/**
+	 * Realizar conexão com a base de dados.
+	 */
+	public function connect() {
+		# Verificar atributos obrigatórios para conexão.
+		if( is_null( self::$manager ) )
+			Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
+		elseif( is_null( $this->user ) || is_null( $this->password ) )
+			Logger::setDisplayMessage( gettext( "As credenciais de conexão com a base de dados precisam ser definidas." ) );
+
+		try {
+			$this->connection = new PDO( $this->getDBDriver()->getDNS( $this->host, $this->port, $this->database ), $this->user, $this->password );
+			$this->connection->setAttribute( PDO::ATTR_CASE, PDO::CASE_LOWER );
+			$this->getDBDriver()->connectionSettings( $this->connection );
+			$this->getDBDriver()->setDBVersion( $this->connection->getAttribute( PDO::ATTR_SERVER_VERSION ) );
+		}catch( Exception $e ) {
+			$this->connection = null;
+			Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Encerrar conexão com a base de dados.
+	 * @return void
+	 */
+	public function close() {
+		$this->connection = null;
 	}
 }
