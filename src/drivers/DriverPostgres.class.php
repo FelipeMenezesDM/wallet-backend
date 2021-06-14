@@ -12,11 +12,11 @@
 namespace Src\Drivers;
 
 class DriverPostgres extends Driver {
-    /* Override */
-    public function getDNS( $host, $port, $database ) {
-        if( is_null( $port ) )
-            $port = "1521";
+	/* Override */
+	public function getDNS( $host, $port, $database ) {
+		if( is_null( $port ) )
+			$port = 5432;
 
-        return "pgsql:host=${host};port=${port};dbname=${database};options='--client_encoding=UTF8'";
-    }
+		return "pgsql:host=${host};port=${port};dbname=${database};options='--client_encoding=UTF8'";
+	}
 }

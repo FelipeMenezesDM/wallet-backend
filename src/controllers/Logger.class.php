@@ -105,4 +105,12 @@ class Logger {
 
 		return $logLine;
 	}
+
+	/**
+	 * Definir tempo de execução de uma instrução para exibição no console.
+	 * @param double $time Tempo de execução em milisegundos.
+	 */
+	public function setExecTime( $time ) {
+		$this->execTimeCounter = $time;
+	}
 }
