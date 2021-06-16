@@ -79,6 +79,17 @@ abstract class Driver {
 	public abstract function getInsertStatement( $table, $columns, $records, $updateDuplicateKey, $primaryKey = null );
 
 	/**
+	 * Obter statement de atualização de registros.
+	 * @param  string $table      Nome da tabela para atualização.
+	 * @param  string $columns    Colunas da tabela para atualização.
+	 * @param  string $joins      Estrutura completa dos joins.
+	 * @param  string $queries    Cláusulas "quando" para atualização de registros.
+	 * @param  string $primaryKey Chave primária da tabela principal.
+	 * @return string
+	 */
+	public abstract function getUpdateStatement( $table, $columns, $joins, $queries, $primaryKey = null );
+
+	/**
 	 * Definir a versão da base de dados.
 	 * @param  string $version Número da versão da base de dados.
 	 * @return void

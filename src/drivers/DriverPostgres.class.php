@@ -36,6 +36,16 @@ class DriverPostgres extends Driver {
     }
 
     /* Override */
+    public function getUpdateStatement( $table, $columns, $joins, $queries, $primaryKey = null ) {
+        $columns = implode( ",", $columns );
+
+        if( empty( $joins ) || !is_array( $joins ) )
+            return "UPDATE ${table} SET ${columns}${queries}";
+
+        return "UPDATE ${table} SET ${columns} FROM " . implode( ", ", $joins ) . "${queries}";
+    }
+
+    /* Override */
     public function getScapeChar() {
         return '';
     }
