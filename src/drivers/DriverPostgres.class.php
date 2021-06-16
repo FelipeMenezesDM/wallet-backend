@@ -46,6 +46,14 @@ class DriverPostgres extends Driver {
     }
 
     /* Override */
+    public function getDeleteStatement( $table, $joins, $queries ) {
+        if( empty( $joins ) || !is_array( $joins ) )
+            return "DELETE FROM ${table}${queries}";
+        
+        return "DELETE FROM ${table} USING " . implode( ", ", $joins ) . "${queries}";
+    }
+
+    /* Override */
     public function getScapeChar() {
         return '';
     }

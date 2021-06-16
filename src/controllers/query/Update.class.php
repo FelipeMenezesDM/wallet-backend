@@ -66,45 +66,6 @@ class Update extends \Src\Controllers\Controller {
 	}
 
 	/**
-	 * Obter lista de tabelas relacionadas.
-	 * @access protected
-	 * @return array
-	 */
-	protected function getRelatedTables() {
-		$tables = & $this->setts[ "using" ];
-		$tables = (array) $tables;
-		$relatedTables = array();
-		$metaQueries = array();
-		$setts = array(
-			"table"		=> "",
-			"key"		=> "",
-			"reference"	=> ""
-		);
-
-		# Listar tabelas relacionadas.
-		foreach( $tables as & $table ) {
-			if( !is_array( $table ) )
-				$table = array( "table" => $table );
-
-			$table = \Src\Controllers\Utils::arrayMerge( $setts, $table );
-			$table[ "table" ] = $this->handlerTable( $table[ "table" ] );
-
-			if( !empty( $table[ "table" ][ "name" ] ) ) {
-				$relatedTables[] = $table[ "table" ];
-
-				# Condição de relacionamento entre as tabelas.
-				$metaQueries[] = array( "key" => $table[ "key" ], "column" => $table[ "reference" ] );
-			}
-		}
-
-		# Adicionar as meta queries automáticas à listagem.
-		if( !empty( $metaQueries ) )
-			$this->setts[ "meta_queries" ][] = array( $metaQueries );
-
-		return $relatedTables;
-	}
-
-	/**
 	 * Obter colunas.
 	 * @access protected
 	 * @param  string    $table Nome da tabela.
@@ -160,8 +121,10 @@ class Update extends \Src\Controllers\Controller {
 		$conn = $this->queryConnection;
 		$stmt = $conn->prepare( $this->query, $this->fields );
 
-		if( $errorCode = $conn->hasError() )
-			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível concluir a rotina de atualização." ), $conn->getError() );
+		if( $conn->hasError() ) {
+			$this->error = $conn->getError();
+			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível concluir a rotina de atualização." ), $this->error );
+		}
 	}
 
 	/* Override */

@@ -124,7 +124,7 @@ class Insert extends \Src\Controllers\Controller {
 
 			$stmt = $conn->prepare( $this->query[ ( $type ) ], $fields );
 
-			if( $errorCode = $conn->hasError() ) {
+			if( $conn->hasError() ) {
 				$this->error = $conn->getError();
 			}else{
 				$conn->commit();

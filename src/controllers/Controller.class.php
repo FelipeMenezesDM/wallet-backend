@@ -410,4 +410,43 @@ abstract class Controller {
 
 		return $query;
 	}
+
+	/**
+	 * Obter lista de tabelas relacionadas.
+	 * @access protected
+	 * @return array
+	 */
+	protected function getRelatedTables() {
+		$tables = & $this->setts[ "using" ];
+		$tables = (array) $tables;
+		$relatedTables = array();
+		$metaQueries = array();
+		$setts = array(
+			"table"		=> "",
+			"key"		=> "",
+			"reference"	=> ""
+		);
+
+		# Listar tabelas relacionadas.
+		foreach( $tables as & $table ) {
+			if( !is_array( $table ) )
+				$table = array( "table" => $table );
+
+			$table = \Src\Controllers\Utils::arrayMerge( $setts, $table );
+			$table[ "table" ] = $this->handlerTable( $table[ "table" ] );
+
+			if( !empty( $table[ "table" ][ "name" ] ) ) {
+				$relatedTables[] = $table[ "table" ][ "name" ] . " " . $table[ "table" ][ "alias" ];
+
+				# Condição de relacionamento entre as tabelas.
+				$metaQueries[] = array( "key" => $table[ "key" ], "column" => $table[ "reference" ] );
+			}
+		}
+
+		# Adicionar as meta queries automáticas à listagem.
+		if( !empty( $metaQueries ) )
+			$this->setts[ "meta_queries" ][] = array( $metaQueries );
+
+		return $relatedTables;
+	}
 }

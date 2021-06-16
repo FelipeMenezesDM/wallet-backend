@@ -90,6 +90,15 @@ abstract class Driver {
 	public abstract function getUpdateStatement( $table, $columns, $joins, $queries, $primaryKey = null );
 
 	/**
+	 * Obter statement de deleção de registros.
+	 * @param  string $table   Nome da tabela para deleção.
+	 * @param  string $joins   Estrutura completa dos joins.
+	 * @param  string $queries Cláusulas "quando" para deleção de registros.
+	 * @return string
+	 */
+	public abstract function getDeleteStatement( $table, $joins, $queries );
+
+	/**
 	 * Definir a versão da base de dados.
 	 * @param  string $version Número da versão da base de dados.
 	 * @return void
