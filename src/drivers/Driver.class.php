@@ -68,6 +68,17 @@ abstract class Driver {
 	}
 
 	/**
+	 * Obter statement de inserção de registros.
+	 * @param  string  $table              Nome da tabela para inserção.
+	 * @param  string  $columns            Definição de colunas para inserção.
+	 * @param  array   $records            Lista de registros para inserção.
+	 * @param  boolean $updateDuplicateKey Definir se o registro deve ser atualizado caso já exista na base.
+	 * @param  string  $primaryKey         Nome da coluna de chave primária.
+	 * @return string
+	 */
+	public abstract function getInsertStatement( $table, $columns, $records, $updateDuplicateKey, $primaryKey = null );
+
+	/**
 	 * Definir a versão da base de dados.
 	 * @param  string $version Número da versão da base de dados.
 	 * @return void

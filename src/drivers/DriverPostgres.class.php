@@ -21,6 +21,21 @@ class DriverPostgres extends Driver {
 	}
 
     /* Override */
+    public function getInsertStatement( $table, $columns, $records, $updateDuplicateKey, $primaryKey = null ) {
+        $insertColumns = implode( ", ", $columns );
+        $insertRecords = implode( ", ", array_map( function( $value ) { return "( " . implode( ", ", (array) $value ) . " )"; }, $records ) );
+        $insert = "INSERT INTO ${table} (${insertColumns}) VALUES ${insertRecords}";
+
+        # Atualizar registros existentes.
+        if( $updateDuplicateKey ) {
+            $updateColumns = implode( ", ", array_map( function( $column ) { return "${column} = EXCLUDED.${column}"; }, array_diff( $columns, array( $primaryKey ) ) ) );
+            $insert .= " ON CONFLICT ($primaryKey) DO UPDATE SET ${updateColumns}";
+        }
+
+        return $insert;
+    }
+
+    /* Override */
     public function getScapeChar() {
         return '';
     }
