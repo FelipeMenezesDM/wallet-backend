@@ -241,7 +241,7 @@ abstract class Controller {
 							$val = trim( $val );
 
 						return $val;
-					}, Utils::arrayMerge( $setts, $meta )
+					}, Utils::arrayMerge( $this->metaQuerySetts, $meta )
 				);
 				$meta[ "compare" ] = ( in_array( strtoupper( $meta[ "compare" ] ), self::COMPARES ) ? strtoupper( $meta[ "compare" ] ) : "=" );
 				$meta[ "relation" ] = ( strtoupper( $meta[ "relation" ] ) == "OR" ? " OR " : " AND " );
@@ -265,7 +265,7 @@ abstract class Controller {
 						$meta[ "value" ] = $param;
 					}
 
-					$meta[ "key" ] = $schema . ".FUZZYSEARCH((" . $driver->cast( $meta[ "key" ], "", "VARCHAR", 200 ) . "), (" . $driver->cast( $meta[ "value" ], "", "VARCHAR", 200 ) . "))";
+					$meta[ "key" ] = $schema . ".FUZZYSEARCH((" . $driver->cast( $meta[ "key" ], "VARCHAR", 200 ) . "), (" . $driver->cast( $meta[ "value" ], "VARCHAR", 200 ) . "))";
 					$meta[ "value" ] = isset( $meta[ "percentage" ] ) ? (int) $meta[ "percentage" ] : 100;
 					$meta[ "compare" ] = ">=";
 				}else{
@@ -372,12 +372,12 @@ abstract class Controller {
 							$meta[ "value" ] = $param;
 						}
 
-						$meta[ "value" ] = "COALESCE((" . $driver->cast( $meta[ "value" ], "", "VARCHAR", 200 ) . "), '')";
+						$meta[ "value" ] = "COALESCE((" . $driver->cast( $meta[ "value" ], "VARCHAR", 200 ) . "), '')";
 					}
 
 					# Caso necessário, obter comparador ILIKE.
 					$meta[ "compare" ] = $driver->getILikeComparator( $meta[ "compare" ] );
-					$meta[ "key" ] = "COALESCE((" . $driver->cast( $meta[ "key" ], "", "VARCHAR", 200 ) . "), '')";
+					$meta[ "key" ] = "COALESCE((" . $driver->cast( $meta[ "key" ], "VARCHAR", 200 ) . "), '')";
 
 					# Aplicar função para ignorar acentuação de caracteres.
 					if( $this->setts[ "unaccent" ] ) {

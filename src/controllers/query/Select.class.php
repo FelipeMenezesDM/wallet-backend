@@ -39,7 +39,6 @@ class Select extends \Src\Controllers\Controller {
 	 */
 	private $joinSetts = array(
 		"table"			=> "",
-		"alias"			=> "",
 		"type"			=> "INNER",
 		"meta_query"	=> array(),
 		"meta_queries"	=> array()
@@ -250,15 +249,15 @@ class Select extends \Src\Controllers\Controller {
 		if( empty( $this->setts[ "fields" ] ) ) {
 			$tables = array();
 
-			foreach( $this->tables as $alias => $name ) {
-				$name = strtolower( trim( $name ) );
+			foreach( $this->tables as $table ) {
+				$table[ "name" ] = strtolower( trim( $table[ "name" ] ) );
 
 				# Não incluir tabelas repetidas na consulta.
-				if( in_array( $name, $tables ) )
+				if( in_array( $table[ "name" ], $tables ) )
 					continue;
 
-				$columns[] = $scapeChar . $alias . $scapeChar . ".*";
-				$tables[] = $name;
+				$columns[] = $scapeChar . $table[ "alias" ] . $scapeChar . ".*";
+				$tables[] = $table[ "name" ];
 			}
 		}else{
 			foreach( (array) $this->setts[ "fields" ] as $alias => $field )
@@ -274,7 +273,7 @@ class Select extends \Src\Controllers\Controller {
 		$stmt = $conn->prepare( $this->query, $this->fields );
 
 		if( !$conn->hasError() ) {
-			$this->resultSet = $stmt->fetchAll( PDO::FETCH_ASSOC );
+			$this->resultSet = $stmt->fetchAll( \PDO::FETCH_ASSOC );
 
 			# Definir número total de resultados após execução da instução.
 			if( isset( $this->resultSet[0][ "foundrows" ] ) )
