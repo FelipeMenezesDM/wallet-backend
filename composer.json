@@ -1,0 +1,18 @@
+{
+    "name": "felipemenezesdm/wallet",
+    "authors": [
+        {
+            "name": "Felipe Menezes",
+            "email": "contato@felipemenezes.com.br",
+            "role": "creator"
+        }
+    ],
+    "type": "library",
+    "minimum-stability": "dev",
+    "autoload": {
+        "files": [ "autoload.php" ]
+    },
+    "config": {
+        "vendor-dir": "libs"
+    }
+}

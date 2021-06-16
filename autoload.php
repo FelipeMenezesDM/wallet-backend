@@ -10,10 +10,12 @@
 
 spl_autoload_register( function( $class ) {
 	# Definir pacote da classe.
-	$path = __DIR__ . str_replace( array( "/", "\\" ), DIRECTORY_SEPARATOR, "/" . $class ) . ".class.php";
+	$path = __DIR__ . str_replace( array( "/", "\\" ), DIRECTORY_SEPARATOR, "/" . $class );
 
-	if( file_exists( $path ) )
-		require_once( $path );
+	if( file_exists( $path . ".class.php" ) )
+		require_once( $path . ".class.php" );
+	elseif( file_exists( $path . ".interface.php" ) )
+		require_once( $path . ".interface.php" );
 	else
 		throw new Exception( "Required class {$class} does not exist. Please contact your system administrator." );
 });
