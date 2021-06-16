@@ -21,4 +21,20 @@ class Utils {
 		$array = array_change_key_case( $array, $case );
 		return array_combine( array_map( "trim", array_keys( $array ) ), $array );
 	}
+
+	/**
+	 * Mesclar dois arrays.
+	 * @param  array   $array1        Array base.
+	 * @param  array   $array2        Array definitivo.
+	 * @param  boolean $caseSensitive Habilitar mesclagem sem case-sensitive para as chaves.
+	 * @return array
+	 */
+	public static function arrayMerge( $array1, $array2, $caseSensitive = false ) {
+		if( !$caseSensitive ) {
+			$array1 = self::arrayKeyHandler( $array1 );
+			$array2 = self::arrayKeyHandler( $array2 );
+		}
+
+		return array_merge( $array1, $array2 );
+	}
 }
