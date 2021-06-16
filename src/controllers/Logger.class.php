@@ -24,7 +24,7 @@ class Logger {
 	 * @access private
 	 * @var    integer
 	 */
-	private $execTimeCounter = 0;
+	private static $execTimeCounter = 0;
 
 	/**
 	 * Criar e exibir mensagem de erro no log do servidor.
@@ -56,7 +56,7 @@ class Logger {
 	 * @return void
 	 */
 	public function setMessage() {
-		$time = $this->execTimeCounter;
+		$time = self::$execTimeCounter;
 		$hours = str_pad( floor( $time / 3600 ), 2, "0", STR_PAD_LEFT );
 		$minutes = str_pad( floor( ( $time - ( $hours * 3600 ) ) / 60 ), 2, "0", STR_PAD_LEFT );
 		$seconds = str_pad( floor( $time % 60 ), 2, "0" ) . substr( ( $time - (int) $time ), 1, 5 );
@@ -110,7 +110,7 @@ class Logger {
 	 * Definir tempo de execução de uma instrução para exibição no console.
 	 * @param double $time Tempo de execução em milisegundos.
 	 */
-	public function setExecTime( $time ) {
-		$this->execTimeCounter = $time;
+	public static function setExecTime( $time ) {
+		self::$execTimeCounter = $time;
 	}
 }

@@ -101,6 +101,13 @@ class Connect {
 	private $error = false;
 
 	/**
+	 * Ligar ou desligar o modo debug de queries executadas na base.
+	 * @access private
+	 * @var    boolean
+	 */
+	private static $debug = false;
+
+	/**
 	 * Método construtor para objeto de conexão com bases de dados.
 	 * @param  string $database Banco de dados padrão da conexão.
 	 * @param  string $user     Usuário da base de dados/instância.
@@ -502,5 +509,19 @@ class Connect {
 		}
 
 		return ( empty( $error[2] ) ? false : (string) $error[0] );
+	}
+
+	/**
+	 * Obter última instrução executada na conexão.
+	 * @param  string $type Tipo da instrução (SELECT, UPDATE, DELETE e INSERT).
+	 * @return string
+	 */
+	public static function getLastQuery( $type = null ) {
+		$type = strtolower( trim( $type ) );
+
+		if( isset( self::$lastQueries[ ( $type ) ] ) )
+			return self::$lastQueries[ ( $type ) ];
+
+		return self::$lastQuery;
 	}
 }

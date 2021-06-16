@@ -19,6 +19,55 @@ abstract class Driver {
 	private static $version = "0";
 
 	/**
+	 * Obter instrução de consulta.
+	 * @param  string $table        Nome da tabela principal de consulta.
+	 * @param  string $columns      Colunas para retorno.
+	 * @param  string $joins        Estrutura completa dos joins.
+	 * @param  string $queries      Cláusulas "quando" para retorno de registros.
+	 * @param  string $groupBy      Estrutura de agrupamento de registros.
+	 * @param  string $orderBy      Cláusulas de ordenação.
+	 * @param  string $reverseOrder Indicar ordenação insersa. Usado exclusivamente para ordenação a partir do número de linha.
+	 * @param  string $perPage      Número de registros por página.
+	 * @param  string $offset       Número de registros para deslocar.
+	 * @return string
+	 */
+	public function getSelectStatement( $table, $columns, $joins, $queries, $groupBy, $orderBy, $reverseOrder, $perPage, $offset ) {
+		$query = "SELECT";
+		$defaultOrderBy = $appends = $orderBy;
+
+		# Definir ORDER BY padrão.
+		if( empty( $defaultOrderBy ) )
+			$defaultOrderBy = " ORDER BY (SELECT NULL)";
+
+		if( $perPage >= 1 ) {
+			$query = "SELECT TAB.* FROM (${query}";
+			$perPageOld = $offset + $perPage;
+
+			if( $reverseOrder ) {
+				$perPageOld = "(FOUNDROWS - ${offset})";
+				$offset = "(FOUNDROWS - " . ( $offset + $perPage ) . ")";
+			}
+
+			$appends .= ") TAB WHERE ROWNUMBER > ${offset} AND ROWNUMBER <= ${perPageOld}";
+		}
+
+		# Inversão de ordem a partir do número de linha.
+		if( $reverseOrder ) {
+			if( $perPage >= 1 || empty( $appends ) )
+				$appends .= " ORDER BY ROWNUMBER DESC";
+			else
+				$appends = preg_replace( "/ORDER BY/i", "ORDER BY ROWNUMBER DESC, ", $appends, 1 );
+		}
+
+		$totalRows = "(SELECT COUNT(*) FROM ${table}{$joins}{$queries}) AS FOUNDROWS";
+
+		# Obter o número das linhas.
+		$rowNumber = "ROW_NUMBER() OVER(${defaultOrderBy} ) AS ROWNUMBER";
+
+		return "${query} ${totalRows}, ${rowNumber}, ${columns} FROM ${table}${joins}${queries}${groupBy}${appends}";
+	}
+
+	/**
 	 * Definir a versão da base de dados.
 	 * @param  string $version Número da versão da base de dados.
 	 * @return void

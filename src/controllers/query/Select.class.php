@@ -18,7 +18,7 @@ class Select extends \Src\Controllers\Controller {
 	 * @access protected
 	 * @var    array
 	 */
-	protected $mainSetts = array(
+	protected $setts = array(
 		"table"			=> "",
 		"fields"		=> array(),
 		"joins"			=> array(),
@@ -108,12 +108,13 @@ class Select extends \Src\Controllers\Controller {
 		$perPage = (int) $this->setts[ "per_page" ];
 		$paged = max( (int) $this->setts[ "paged" ], 1 ) - 1;
 		$offset = ( $paged * $perPage );
+		$tableName = $table[ "schema" ] . "." . $table[ "name" ] . " AS " . $table[ "alias" ];
 
 		# Tratamento para ordenação com número da linha.
-		$orders = Utils::arrayKeyHandler( $this->setts[ "order_by" ] );
+		$orders = \Src\Controllers\Utils::arrayKeyHandler( $this->setts[ "order_by" ] );
 		$reverseOrder = ( array_key_exists( "rownumber", $orders ) && ( strtoupper( trim( $orders[ "rownumber" ] ) ) == "DESC" ) );
 
-		return $conn->getDBDriver()->getSelectStatement( $table, $columns, $joins, $queries, $groupBy, $orderBy, $reverseOrder, $perPage, $offset );
+		return $conn->getDBDriver()->getSelectStatement( $tableName, $columns, $joins, $queries, $groupBy, $orderBy, $reverseOrder, $perPage, $offset );
 	}
 
 	/* Override */
@@ -134,10 +135,11 @@ class Select extends \Src\Controllers\Controller {
 			if( !is_array( $join ) )
 				continue;
 
-			$join = Utils::arrayMerge( $this->joinSetts, $join );
+			$join = \Src\Controllers\Utils::arrayMerge( $this->joinSetts, $join );
 			$join[ "type" ] = ( strtoupper( trim( $join[ "type" ] ) ) );
 			
 			$table = $this->handlerTable( $join[ "table" ] );
+			$tableName = $table[ "schema" ] . "." . $table[ "name" ] . " AS " . $table[ "alias" ];
 			$queries = "ON ";
 
 			# Verificando tipo de mesclagem.
@@ -152,7 +154,7 @@ class Select extends \Src\Controllers\Controller {
 			if( !empty( $join[ "meta_queries" ] ) )
 				$queries .= $this->getMetaQueries( $join[ "meta_queries" ] );
 
-			$query .= " " . $join[ "type" ] . " JOIN ${table} ${queries}";
+			$query .= " " . $join[ "type" ] . " JOIN ${tableName} ${queries}";
 		}
 
 		return $query;
@@ -292,7 +294,7 @@ class Select extends \Src\Controllers\Controller {
 			}
 		}else{
 			$this->error = $conn->getError();
-			$conn->setMessage( gettext( "Não foi possível finalizar a execução da instrução." ), $this->error );
+			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível finalizar a execução da instrução." ), $this->error );
 		}
 	}
 
