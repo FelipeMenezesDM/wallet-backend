@@ -10,9 +10,9 @@
  * @version   1.0.0
  */
 
-namespace Src\Controllers\Query;
+namespace Src\Db\Query;
 
-class Delete extends \Src\Controllers\Controller {
+class Delete extends \Src\Db\Controller {
 	/**
 	 * Atributo de configurações do objeto.
 	 * @access protected

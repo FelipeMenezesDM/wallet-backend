@@ -9,7 +9,7 @@
  * @version   1.0.0
  */
 
-namespace Src\Controllers;
+namespace Src\Db;
 
 abstract class Controller {
 	/**
@@ -114,11 +114,11 @@ abstract class Controller {
 
 		# Objeto inútil se não houver o objeto de conexão.
 		if( is_null( $this->queryConnection ) || !$this->queryConnection->getConnectionStatus() )
-			Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ) );
+			\Src\Controllers\Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ) );
 
 		# Tratamento de atributos de configuração.
 		if( is_array( $settsOrQuery ) ) {
-			$this->setts = Utils::arrayMerge( $this->setts, $settsOrQuery );
+			$this->setts = \Src\Controllers\Utils::arrayMerge( $this->setts, $settsOrQuery );
 			$this->setts[ "table" ] = $this->handlerTable( $this->setts[ "table" ] );
 			$this->query = $this->getAutoQuery();
 		}else{
@@ -130,9 +130,9 @@ abstract class Controller {
 
 		# Obter e executar rotinas.
 		if( empty( $this->query ) )
-			Logger::setLogMessage( gettext( "Não é possível executar instruções em branco." ) );
+			\Src\Controllers\Logger::setLogMessage( gettext( "Não é possível executar instruções em branco." ) );
 		elseif( $DMLType != $this->getAllowedDML() )
-			Logger::setLogMessage( sprintf( gettext( "O controlador não suporta a instrução \"%s\"." ), $DMLType ) );
+			\Src\Controllers\Logger::setLogMessage( sprintf( gettext( "O controlador não suporta a instrução \"%s\"." ), $DMLType ) );
 		else
 			$this->execute();
 	}
@@ -150,7 +150,7 @@ abstract class Controller {
 		$schema = $this->queryConnection->getSchema();
 		$alias = "TAB" . str_pad( ( count( $this->tables ) + 1 ), 2, "0", STR_PAD_LEFT );
 		$setts = array( "name" => "", "alias" => $alias, "schema" => $schema );
-		$table = Utils::arrayMerge( $setts, $table );
+		$table = \Src\Controllers\Utils::arrayMerge( $setts, $table );
 
 		# Adicionar à lista de tabelas usadas pelo controlador.
 		$this->tables[] = $table;
@@ -241,7 +241,7 @@ abstract class Controller {
 							$val = trim( $val );
 
 						return $val;
-					}, Utils::arrayMerge( $this->metaQuerySetts, $meta )
+					}, \Src\Controllers\Utils::arrayMerge( $this->metaQuerySetts, $meta )
 				);
 				$meta[ "compare" ] = ( in_array( strtoupper( $meta[ "compare" ] ), self::COMPARES ) ? strtoupper( $meta[ "compare" ] ) : "=" );
 				$meta[ "relation" ] = ( strtoupper( $meta[ "relation" ] ) == "OR" ? " OR " : " AND " );
@@ -314,8 +314,8 @@ abstract class Controller {
 					}
 					# Comparador de intervalos.
 					elseif( $meta[ "compare" ] == "BETWEEN" ) {
-						$meta[ "value" ] = Utils::arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "value" ] );
-						$meta[ "column" ] = Utils::arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "column" ] );
+						$meta[ "value" ] = \Src\Controllers\Utils::arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "value" ] );
+						$meta[ "column" ] = \Src\Controllers\Utils::arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "column" ] );
 
 						if( $isColumn ) {
 							$meta[ "value" ] = $meta[ "column" ][ "min" ] . " AND " . $meta[ "column" ][ "max" ];

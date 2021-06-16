@@ -8,7 +8,7 @@
  * @version   1.0.0
  */
 
-namespace Src\Controllers;
+namespace Src\Db;
 
 class Connect {
 	/**
@@ -169,17 +169,17 @@ class Connect {
 
 			# Verificar se o gerenciador foi definido.
 			if( empty( $manager ) )
-				Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
+				\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
 
 			# Definir driver do gerenciador.
 			if( !in_array( $manager, self::DRIVERS ) || !class_exists( $driver ) )
-				logger::setDisplayMessage( gettext( "O gerenciador de base de dados definido não é suportado." ) );
+				\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados definido não é suportado." ) );
 			else
 				self::$driver = new $driver();
 
 			self::$manager = $manager;
 		}else{
-			Logger::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
+			\Src\Controllers\Logger::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
 		}
 	}
 
@@ -283,9 +283,9 @@ class Connect {
 	public function connect() {
 		# Verificar atributos obrigatórios para conexão.
 		if( is_null( self::$manager ) )
-			Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
+			\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
 		elseif( is_null( $this->user ) || is_null( $this->password ) )
-			Logger::setDisplayMessage( gettext( "As credenciais de conexão com a base de dados precisam ser definidas." ) );
+			\Src\Controllers\Logger::setDisplayMessage( gettext( "As credenciais de conexão com a base de dados precisam ser definidas." ) );
 
 		try {
 			$this->connection = new \PDO( $this->getDBDriver()->getDNS( $this->host, $this->port, $this->database ), $this->user, $this->password );
@@ -294,7 +294,7 @@ class Connect {
 			$this->getDBDriver()->setDBVersion( $this->connection->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
 		}catch( Exception $e ) {
 			$this->connection = null;
-			Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
+			\Src\Controllers\Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
 		}
 	}
 
@@ -348,7 +348,7 @@ class Connect {
 	 */
 	private function run( $sql, $type, $params = array(), $saveQuery = true ) {
 		if( is_null( $this->connection ) ) {
-			Logger::setLogMessage( gettext( "A conexão com a base de dados não foi estabelecida." ) );
+			\Src\Controllers\Logger::setLogMessage( gettext( "A conexão com a base de dados não foi estabelecida." ) );
 			return false;
 		}
 
@@ -423,16 +423,16 @@ class Connect {
 
 			# Imprimir última query executada, caso o modo debug esteja ligado.
 			if( self::$debug && !empty( $this->getLastQuery() ) )
-				Logger::setLogMessage( $this->getLastQuery(), self::LOG_INFO );
+				\Src\Controllers\Logger::setLogMessage( $this->getLastQuery(), self::LOG_INFO );
 		}catch( Exception $e ) {
 			# Imprimir última query executada, caso o modo debug esteja ligado.
 			if( self::$debug )
-				Logger::setLogMessage( $this->getLastQuery() );
+				\Src\Controllers\Logger::setLogMessage( $this->getLastQuery() );
 
-			Logger::setLogMessage( gettext( "Falha na execução da instrução." ), $e->getMessage() );
+			\Src\Controllers\Logger::setLogMessage( gettext( "Falha na execução da instrução." ), $e->getMessage() );
 		}
 
-		Logger::setExecTime( ( time() + (double) microtime() ) - $start );
+		\Src\Controllers\Logger::setExecTime( ( time() + (double) microtime() ) - $start );
 		return $resultSet;
 	}
 
