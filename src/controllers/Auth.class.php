@@ -16,8 +16,14 @@ class Auth {
 	 * @return boolean
 	 */
 	public static function isAuth() {
-		$clientId = getenv( "OKTACLIENTID" );
-		$clientSecret = getenv( "OKTASECRET" );
+		$clientSecret = $clientId = "";
+
+		if( isset( $_REQUEST[ "client_id" ] ) )
+			$clientId = $_REQUEST[ "client_id" ];
+
+		if( isset( $_REQUEST[ "client_secret" ] ) )
+			$clientSecret = $_REQUEST[ "client_secret" ];
+
 		$scope = getenv( "OKTASCOPE" );
 		$issuer = getenv( "OKTAISSUER" );
 
