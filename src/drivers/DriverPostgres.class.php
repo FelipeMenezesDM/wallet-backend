@@ -19,4 +19,9 @@ class DriverPostgres extends Driver {
 
 		return "pgsql:host=${host};port=${port};dbname=${database};options='--client_encoding=UTF8'";
 	}
+
+    /* Override */
+    public function getScapeChar() {
+        return '';
+    }
 }

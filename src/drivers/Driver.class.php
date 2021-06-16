@@ -53,4 +53,12 @@ abstract class Driver {
 	public function connectionSettings( $connection = null ) {
 		return;
 	}
+
+	/**
+	 * Obter scape para nomes e alias de tabelas e colunas.
+	 * @return string
+	 */
+	public function getScapeChar() {
+		return '"';
+	}
 }
