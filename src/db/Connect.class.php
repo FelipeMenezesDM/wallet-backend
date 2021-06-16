@@ -252,6 +252,14 @@ class Connect {
 	}
 
 	/**
+	 * Ligar ou desligar modo de debug para as queries executadas na base.
+	 * @param boolean $mode Modo de debug.
+	 */
+	public static function setDebugMode( $mode = true ) {
+		self::$debug = (bool) $mode;
+	}
+
+	/**
 	 * Iniciar transação.
 	 */
 	public function beginTransaction() {
