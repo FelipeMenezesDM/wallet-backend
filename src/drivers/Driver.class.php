@@ -76,7 +76,7 @@ abstract class Driver {
 	 * @param  string  $primaryKey         Nome da coluna de chave primária.
 	 * @return string
 	 */
-	public abstract function getInsertStatement( $table, $columns, $records, $updateDuplicateKey, $primaryKey = null );
+	abstract public function getInsertStatement( $table, $columns, $records, $updateDuplicateKey, $primaryKey = null );
 
 	/**
 	 * Obter statement de atualização de registros.
@@ -87,7 +87,7 @@ abstract class Driver {
 	 * @param  string $primaryKey Chave primária da tabela principal.
 	 * @return string
 	 */
-	public abstract function getUpdateStatement( $table, $columns, $joins, $queries, $primaryKey = null );
+	abstract public function getUpdateStatement( $table, $columns, $joins, $queries, $primaryKey = null );
 
 	/**
 	 * Obter statement de deleção de registros.
@@ -96,7 +96,7 @@ abstract class Driver {
 	 * @param  string $queries Cláusulas "quando" para deleção de registros.
 	 * @return string
 	 */
-	public abstract function getDeleteStatement( $table, $joins, $queries );
+	abstract public function getDeleteStatement( $table, $joins, $queries );
 
 	/**
 	 * Definir a versão da base de dados.
@@ -123,7 +123,7 @@ abstract class Driver {
 	 * @param  string $database Nome da base de dados. Obs: no caso do Postgre, o nome da base é case sensitive.
 	 * @return string
 	 */
-	public abstract function getDNS( $host, $port, $database );
+	abstract public function getDNS( $host, $port, $database );
 
 	/**
 	 * Método para definir configurações primárias da conexão.
@@ -157,7 +157,7 @@ abstract class Driver {
 	 * Retornar operador de concatenação do gerenciador.
 	 * @return string
 	 */
-	public abstract function getConcatOperator();
+	abstract public function getConcatOperator();
 
 	/**
 	 * Concatenação de valores com tratamento de nulos.

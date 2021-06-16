@@ -19,7 +19,7 @@ class Request {
 	/**
 	 * Lista de tipos de requisições permitidas para a API.
 	 */
-	const RESQUEST_TYPES = array( "get", "post", "put", "delete" );
+	const RESQUEST_TYPES = array( "get", "post", "put", "delete", "service" );
 
 	/**
 	 * Parâmetros globais da requisição.
@@ -163,12 +163,25 @@ class Request {
 				$object = new \Src\Db\Query\Insert( $request );
 				$this->response[ "last_insert_id" ] = $object->getLastInsertID();
 			break;
+			case "service" : # Requisição de serviços.
+				$service = "\Src\Services\\" . $this->requestParams[ "object" ];
+
+				if( !class_exists( $service ) ) {
+					$object = false;
+				}else{
+					$service = new $service( $request );
+					$object = $service->getResults();
+					$this->response[ "results" ] = $object;
+				}
+			break;
 		}
 
 		# Validação do objeto.
 		if( is_null( $object ) )
-			$this->response[ "message" ] = gettext( "Unknown error." );
-		elseif( $object->hasError() )
+			$this->response[ "message" ] = gettext( "Erro desconhecido." );
+		elseif( $object === false )
+			$this->response[ "message" ] = gettext( "Serviço não encontrado." );
+		elseif( is_object( $object ) && $object->hasError() )
 			$this->response[ "message" ] = gettext( $object->getError() );
 		else
 			$this->response[ "status" ] = "success";
