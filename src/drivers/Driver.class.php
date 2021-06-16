@@ -61,4 +61,62 @@ abstract class Driver {
 	public function getScapeChar() {
 		return '"';
 	}
+
+	/**
+	 * Converter tipo de coluna.
+	 * @param  string $column Nome da coluna.
+	 * @param  string $type   Tipo para conversão.
+	 * @param  int    $length Tamanho máximo do campo.
+	 * @return string
+	 */
+	public function cast( $column, $type, $length = null ) {
+		return "CAST(${column} AS ${type}" . ( is_null( $length ) ? "" : "(${length})" ) . ")";
+	}
+
+	/**
+	 * Retornar operador de concatenação do gerenciador.
+	 * @return string
+	 */
+	public abstract function getConcatOperator();
+
+	/**
+	 * Concatenação de valores com tratamento de nulos.
+	 * @return string
+	 */
+	public function concatNoCoalesce() {
+		$args = func_get_args();
+
+		if( empty( $args ) )
+			return "";
+
+		return implode( " " . $this->getConcatOperator() . " ", $args );
+	}
+
+	/**
+	 * Obter comparação ILIKE a partir de comparator.
+	 * @param  string $comparator Comparador original.
+	 * @return string
+	 */
+	public function getILikeComparator( $comparator ) {
+		return $comparator;
+	}
+
+	/**
+	 * Obter lista de itens para uso do ILIKE em substituição ao IN ou NOT IN.
+	 * @param  string $items Lista de itens do ILIKE.
+	 * @return string
+	 */
+	public function getILikeArray( $items = array() ) {
+		return "(" . implode( ", ", (array) $items ) . ")";
+	}
+
+	/**
+	 * Função para tratamento de elementos para ignorar acentuação de palavras para comparação.
+	 * @param  string $schema    Schema da funçao de tratamento de elementos.
+	 * @param  string $reference Elemento de referência para tratamento.
+	 * @return string
+	 */
+	public function ignoreAccents( $schema, $reference ) {
+		return $reference;
+	}
 }

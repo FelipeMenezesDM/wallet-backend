@@ -24,4 +24,38 @@ class DriverPostgres extends Driver {
     public function getScapeChar() {
         return '';
     }
+
+    /* Override */
+    public function getConcatOperator() {
+        return "||";
+    }
+
+    /* Override */
+    public function getILikeArray( $items = array() ) {
+        return "ANY(ARRAY[" . implode( ", ", (array) $items ) . "])";
+    }
+
+    /* Override */
+    public function getILikeComparator( $comparator ) {
+        $map = array(
+            "IN"        => "LIKE",
+            "NOT IN"    => "NOT LIKE",
+            "="         => "LIKE",
+            "!="        => "NOT LIKE",
+            "<>"        => "NOT LIKE"
+        );
+
+        if( isset( $map[ ( $comparator ) ] ) )
+            $comparator = $map[ ( $comparator ) ];
+
+        return str_replace( "LIKE", "ILIKE", $comparator );
+    }
+
+    /* Override */
+    public function ignoreAccents( $schema, $reference ) {
+        if( is_array( $reference ) )
+            return array_map( function( $value ) use ( $schema ) { return "${schema}.unaccent(${value})"; }, $reference );
+
+        return "${schema}.unaccent(${reference})";
+    }
 }

@@ -101,10 +101,6 @@ class Select extends \Src\Controllers\Controller {
 		# Obter estrutura condicional.
 		$queries = $this->getMetaQueries( $setts[ "meta_queries" ] );
 
-		# Incluir cláusulas livres apenas em requisições diretas.
-		/*if( !empty( $setts[ "function" ] ) && !$this->isApi )
-			$queries .= ( !empty( $queries ) ? " AND " : "" ) . $setts[ "function" ];
-
 		if( !empty( $queries ) )
 			$queries = " WHERE " . $queries;
 
@@ -114,10 +110,10 @@ class Select extends \Src\Controllers\Controller {
 		$offset = ( $paged * $perPage );
 
 		# Tratamento para ordenação com número da linha.
-		$orders = smoothConnect::arrayKeyHandler( $this->setts[ "order_by" ] );
+		$orders = Utils::arrayKeyHandler( $this->setts[ "order_by" ] );
 		$reverseOrder = ( array_key_exists( "rownumber", $orders ) && ( strtoupper( trim( $orders[ "rownumber" ] ) ) == "DESC" ) );
 
-		return $conn->getDBDriver()->getSelectStatement( $table, $columns, $joins, $queries, $groupBy, $orderBy, $reverseOrder, $perPage, $offset );*/
+		return $conn->getDBDriver()->getSelectStatement( $table, $columns, $joins, $queries, $groupBy, $orderBy, $reverseOrder, $perPage, $offset );
 	}
 
 	/* Override */
