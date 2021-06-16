@@ -39,7 +39,6 @@ class Request {
 		"results"		=> array()
 	);
 
-
 	/**
 	 * Método construtor.
 	 * @param array $requestParams Parâmetros de requsição da API.
@@ -75,6 +74,9 @@ class Request {
 		# Verificar se o tipo de requisição está preenchido.
 		elseif( empty( $params[ "object" ] ) )
 			$response[ "message" ] = gettext( "O objeto da requisição não foi informado." );
+		# Verificar autenticação da requisição.
+		elseif( !Auth::isAuth() )
+			$response[ "message" ] = gettext( "Requisição não autorizada." );
 		else {
 			$fileName = $params[ "object" ];
 
