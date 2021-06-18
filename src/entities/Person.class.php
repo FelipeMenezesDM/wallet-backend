@@ -8,7 +8,6 @@
  * @version   1.0.0
  */
 
-
 namespace Src\Entities;
 
 class Person extends Entity {
