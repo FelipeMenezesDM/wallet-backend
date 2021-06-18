@@ -108,6 +108,13 @@ class Connect {
 	private static $debug = false;
 
 	/**
+	 * Definir se a conexão é de autocommit.
+	 * @access private
+	 * @var    boolean
+	 */
+	private $isAutocommit = true;
+
+	/**
 	 * Método construtor para objeto de conexão com bases de dados.
 	 * @param  string $database Banco de dados padrão da conexão.
 	 * @param  string $user     Usuário da base de dados/instância.
@@ -517,6 +524,22 @@ class Connect {
 		}
 
 		return ( empty( $error[2] ) ? false : (string) $error[0] );
+	}
+
+	/**
+	 * Definir se o campo de dados é autocommit.
+	 * @param boolean $autocommit Definir autocommit para a conexão.
+	 */
+	public function setAutocommit( $autocommit ) {
+		$this->isAutocommit = $autocommit;
+	}
+
+	/**
+	 * Verificar se a conexão é autocommit.
+	 * @return boolean
+	 */
+	public function isAutocommit() {
+		return $this->isAutocommit;
 	}
 
 	/**

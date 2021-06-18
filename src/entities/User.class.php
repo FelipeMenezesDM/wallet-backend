@@ -27,11 +27,11 @@ class User extends Person {
 	var $user_person_id;
 	var $user_creation;
 
-	public function setUser_Id( $user_id ) {
+	public function setUserId( $user_id ) {
 		$this->user_id = $user_id;
 	}
 
-	public function getUser_Id() {
+	public function getUserId() {
 		return $this->user_id;
 	}
 
@@ -51,19 +51,19 @@ class User extends Person {
 		return $this->password;
 	}
 
-	public function setUser_Person_Id( $user_person_id ) {
+	public function setUserPersonId( $user_person_id ) {
 		$this->user_person_id = $user_person_id;
 	}
 
-	public function getUser_Person_Id() {
+	public function getUserPersonId() {
 		return $this->user_person_id;
 	}
 
-	public function setUser_Creation( $user_creation ) {
+	public function setUserCreation( $user_creation ) {
 		$this->user_creation = $user_creation;
 	}
 
-	public function getUser_creation() {
+	public function getUserCreation() {
 		return $this->user_creation;
 	}
 

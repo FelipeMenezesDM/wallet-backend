@@ -18,11 +18,11 @@ class Payment extends Entity {
 	var $value;
 	var $payment_creation;
 
-	public function setPayment_Id( $payment_id ) {
+	public function setPaymentId( $payment_id ) {
 		$this->payment_id = $payment_id;
 	}
 
-	public function getPayment_Id() {
+	public function getPaymentId() {
 		return $this->payment_id;
 	}
 
@@ -50,11 +50,11 @@ class Payment extends Entity {
 		return $this->value;
 	}
 
-	public function setPayment_Creation( $payment_creation ) {
+	public function setPaymentCreation( $payment_creation ) {
 		$this->payment_creation = $payment_creation;
 	}
 
-	public function getPayment_Creation() {
+	public function getPaymentCreation() {
 		return $this->payment_creation;
 	}
 }

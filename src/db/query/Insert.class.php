@@ -114,7 +114,10 @@ class Insert extends \Src\Db\Controller {
 	/* Override */
 	protected function execute() {
 		$conn = $this->queryConnection;
-		$conn->beginTransaction();
+
+		if( !$conn->getPDOConnection()->inTransaction() )
+			$conn->beginTransaction();
+		
 		$lastInsertID = null;
 
 		# Listar e executar instruções com e sem inserção de identidade.
@@ -127,8 +130,10 @@ class Insert extends \Src\Db\Controller {
 			if( $conn->hasError() ) {
 				$this->error = $conn->getError();
 			}else{
-				$conn->commit();
-				$lastInsertID = $conn->getPDOConnection()->lastInsertID();
+				if( $conn->isAutocommit() )
+					$conn->commit();
+
+				// $lastInsertID = $conn->getPDOConnection()->lastInsertID();
 
 				# Obter chave do último registro inserido, em caso de inserção de identidade.
 				if( !$lastInsertID )
@@ -144,7 +149,10 @@ class Insert extends \Src\Db\Controller {
 			$this->lastInsertID = $lastInsertID;
 		}else{
 			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível inserir o registro na base de dados." ), $this->error );
-			$conn->rollback();
+
+			if( $conn->isAutocommit() )
+				$conn->rollback();
+
 			$this->lastInsertID = null;
 		}
 	}

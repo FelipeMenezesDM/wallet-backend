@@ -18,19 +18,19 @@ class Wallet extends Entity {
 	var $balance;
 	var $wallet_creation;
 
-	public function setWallet_Id( $wallet_id ) {
+	public function setWalletId( $wallet_id ) {
 		$this->wallet_id = $wallet_id;
 	}
 
-	public function getWallet_Id() {
+	public function getWalletId() {
 		return $this->wallet_id;
 	}
 
-	public function setWallet_Person_Id( $wallet_person_id ) {
+	public function setWalletPersonId( $wallet_person_id ) {
 		$this->wallet_person_id = $wallet_person_id;
 	}
 
-	public function getWallet_Person_Id() {
+	public function getWalletPersonId() {
 		return $this->wallet_person_id;
 	}
 
@@ -42,11 +42,11 @@ class Wallet extends Entity {
 		return $this->balance;
 	}
 
-	public function setWallet_Creation( $wallet_creation ) {
+	public function setWalletCreation( $wallet_creation ) {
 		$this->wallet_creation = $wallet_creation;
 	}
 
-	public function getWallet_Creation() {
+	public function getWalletCreation() {
 		return $this->wallet_creation;
 	}
 }

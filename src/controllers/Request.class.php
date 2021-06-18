@@ -177,7 +177,14 @@ class Request {
 				try{
 					$service = new $service( $request );
 					$object = $service->getResults();
-					$this->response[ "results" ] = $object;
+
+					if( !$object ) {
+						$this->response[ "status" ] = "error";
+						$this->response[ "message" ] = null;
+					}else{
+						$this->response[ "results" ] = $object;
+					}
+
 				}catch(\Exception $e) {
 					$object = false;
 				}

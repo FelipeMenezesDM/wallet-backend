@@ -11,7 +11,7 @@
 namespace Src\Services;
 
 class Signin implements Service {
-	private $results = null;
+	protected $results = null;
 
 	/**
 	 * Método do construtor.
@@ -36,9 +36,9 @@ class Signin implements Service {
 			$user = new \Src\Entities\User();
 			$user->getByAuthFields( $request[ "email" ] );
 
-			if( !is_null( $user->getUser_Id() ) && password_verify( $request[ "password" ], $user->getPassword() ) ) {
+			if( !is_null( $user->getUserId() ) && password_verify( $request[ "password" ], $user->getPassword() ) ) {
 				$header = array( "typ" => "JWT", "alg" => "HS256" );
-				$payload = array( "id" => $user->getUser_Id(), "email" => $user->getEmail() );
+				$payload = array( "id" => $user->getUserId(), "email" => $user->getEmail() );
 
 				$header = json_encode( $header );
 				$payload = json_encode( $payload );
@@ -46,7 +46,7 @@ class Signin implements Service {
 				$header = self::base64UrlEncode( $header );
 				$payload = self::base64UrlEncode( $payload );
 
-				$sign = hash_hmac( "sha256", $header . "." . $payload, "AQUI", true );
+				$sign = hash_hmac( "sha256", $header . "." . $payload, getenv( "OKTACLIENTSECRET" ), true );
 				$sign = self::base64UrlEncode( $sign );
 				$token = $header . "." . $payload . "." . $sign;
 

@@ -19,9 +19,26 @@ abstract class Entity {
 	/* Override */
 	const JOINS = array();
 
+	/**
+	 * Objeto de resultados de consultas.
+	 * @access private
+	 * @var    null
+	 */
 	private $object = null;
 
+	/**
+	 * Armazenar retorno com erro.
+	 * @access private
+	 * @var    null
+	 */
 	private $error = null;
+
+	/**
+	 * Objeto de conexão específico.
+	 * @access private
+	 * @var    null
+	 */
+	private $connection = null;
 
 	/**
 	 * Consultar registros com configurações livres.
@@ -35,7 +52,7 @@ abstract class Entity {
 		if( !isset( $request[ "joins" ] ) )
 			$request[ "joins" ] = static::JOINS;
 
-		$query = new \Src\Db\Query\Select( $request );
+		$query = new \Src\Db\Query\Select( $request, null, $this->connection );
 		$this->error = $query->getError();
 
 		if( !$query->hasError() ) {
@@ -75,7 +92,7 @@ abstract class Entity {
 		}
 
 		$request[ "item" ] = $item;
-		$query = new \Src\Db\Query\Insert( $request );
+		$query = new \Src\Db\Query\Insert( $request, null, $this->connection );
 		$this->error = $query->getError();
 
 		if( !$query->hasError() ) {
@@ -114,7 +131,7 @@ abstract class Entity {
 		$request[ "key" ] = static::KEY_NAME;
 		$request[ "sets" ] = $sets;
 		$request[ "meta_query" ] = $metaQuery;
-		$query = new \Src\Db\Query\Update( $request );
+		$query = new \Src\Db\Query\Update( $request, null, $this->connection );
 		$this->error = $query->getError();
 
 		if( !$query->hasError() )
@@ -135,7 +152,7 @@ abstract class Entity {
 			"meta_query" => array( array( "key" => static::KEY_NAME, "value" => $this->getPropValue( static::KEY_NAME ) ) )
 		);
 
-		$query = new \Src\Db\Query\Delete( $request );
+		$query = new \Src\Db\Query\Delete( $request, null, $this->connection );
 		$this->error = $query->getError();
 
 		if( !$query->hasError() )
@@ -197,8 +214,8 @@ abstract class Entity {
 	 * @return string
 	 */
 	public function getPropValue( $prop ) {
-		if( method_exists( $this, "get" . $prop ) ) {
-			return call_user_func( array( $this, "get" . $prop ) );
+		if( method_exists( $this, "get" . str_replace( "_", "", $prop ) ) ) {
+			return call_user_func( array( $this, "get" . str_replace( "_", "", $prop ) ) );
 		}
 
 		return null;
@@ -211,8 +228,8 @@ abstract class Entity {
 	 * @return string
 	 */
 	private function setPropValue( $prop, $value ) {
-		if( method_exists( $this, "set" . $prop ) ) {
-			call_user_func_array( array( $this, "set" . $prop ), array( $value ) );
+		if( method_exists( $this, "set" . str_replace( "_", "", $prop ) ) ) {
+			call_user_func_array( array( $this, "set" . str_replace( "_", "", $prop ) ), array( $value ) );
 		}
 	}
 
@@ -238,5 +255,13 @@ abstract class Entity {
 	 */
 	public function hasError() {
 		return (boolean) $this->error;
+	}
+
+	/**
+	 * Definir um objeto de conexão para as transações da entidade.
+	 * @param object $connection Objeto de conexão do PDO.
+	 */
+	public function setConnection( $connection ) {
+		$this->connection = $connection;
 	}
 }
