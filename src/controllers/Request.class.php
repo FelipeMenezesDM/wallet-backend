@@ -44,6 +44,17 @@ class Request {
 	 * @param array $requestParams Parâmetros de requsição da API.
 	 */
 	public function __construct( $requestParams = array() ) {
+		# Limpar buffer com conteúdo desnecessário.
+		while( ob_get_level() )
+			ob_end_clean();
+
+		header( "Access-Control-Allow-Origin: *" ); 
+		header( "Access-Control-Allow-Credentials: true");
+		header( "Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS" );
+    	header( "Access-Control-Max-Age: 1000" );
+    	header( "Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token , Authorization" );
+    	header( "Content-Type: application/json" );
+
 		$response = & $this->response;
 		$params = & $this->requestParams;
 		$params = array_intersect_key( \Src\Controllers\Utils::arrayKeyHandler( $requestParams ), array_flip( array( "version", "type", "object" ) ) );
@@ -87,7 +98,7 @@ class Request {
 		# Tentativa de conversão em JSON para testar resposta.
 		try{
 			json_encode( $response, $isPretty );
-		}catch( Exception $e ){}
+		}catch( \Exception $e ){}
 
 		# Verificar erro de conversão da resposta em JSON.
 		switch( json_last_error() ) {
@@ -119,11 +130,6 @@ class Request {
 			$response[ "status" ] = "error";
 		}
 
-		# Limpar buffer com conteúdo desnecessário.
-		while( ob_get_level() )
-			ob_end_clean();
-
-		header( "Content-Type: application/json" );
 		header( "Content-Disposition: inline; filename=\"" . $fileName . ".json\"" );
 		echo json_encode( $response, $isPretty );
 	}
@@ -166,14 +172,14 @@ class Request {
 				$this->response[ "last_insert_id" ] = $object->getLastInsertID();
 			break;
 			case "service" : # Requisição de serviços.
-				$service = "\Src\Services\\" . $this->requestParams[ "object" ];
+				$service = "Src\Services\\" . $this->requestParams[ "object" ];
 
-				if( !class_exists( $service ) ) {
-					$object = false;
-				}else{
+				try{
 					$service = new $service( $request );
 					$object = $service->getResults();
 					$this->response[ "results" ] = $object;
+				}catch(\Exception $e) {
+					$object = false;
 				}
 			break;
 		}

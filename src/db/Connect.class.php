@@ -300,7 +300,7 @@ class Connect {
 			$this->connection->setAttribute( \PDO::ATTR_CASE, \PDO::CASE_LOWER );
 			$this->getDBDriver()->connectionSettings( $this->connection );
 			$this->getDBDriver()->setDBVersion( $this->connection->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
-		}catch( Exception $e ) {
+		}catch( \Exception $e ) {
 			$this->connection = null;
 			\Src\Controllers\Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
 		}
@@ -419,7 +419,7 @@ class Connect {
 
 						if( $resultSet->errorCode() !== "00000" )
 							$this->error = $resultSet->errorInfo();
-					}catch( Exception $ex ) {
+					}catch( \Exception $ex ) {
 						$this->error = $resultSet->errorInfo();
 						$resultSet = false;
 					}
@@ -432,7 +432,7 @@ class Connect {
 			# Imprimir última query executada, caso o modo debug esteja ligado.
 			if( self::$debug && !empty( $this->getLastQuery() ) )
 				\Src\Controllers\Logger::setLogMessage( $this->getLastQuery(), self::LOG_INFO );
-		}catch( Exception $e ) {
+		}catch( \Exception $e ) {
 			# Imprimir última query executada, caso o modo debug esteja ligado.
 			if( self::$debug )
 				\Src\Controllers\Logger::setLogMessage( $this->getLastQuery() );

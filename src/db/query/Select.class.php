@@ -352,7 +352,7 @@ class Select extends \Src\Db\Controller {
 						$finfo = finfo_open();
 						$mimeType = finfo_buffer( $finfo, $element[ ( $key ) ], FILEINFO_MIME_TYPE );
 						finfo_close( $finfo );
-					}catch( Exception $e ) {
+					}catch( \Exception $e ) {
 						$mimeType = "none";
 					}
 
