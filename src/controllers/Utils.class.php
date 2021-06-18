@@ -37,4 +37,12 @@ class Utils {
 
 		return array_merge( $array1, $array2 );
 	}
+
+	/**
+	 * Gerador de UUIDs.
+	 * @return string
+	 */
+	public static function getUuid() {
+		return md5( uniqid( rand(), true ) );
+	}
 }
