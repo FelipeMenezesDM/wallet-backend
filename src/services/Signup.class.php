@@ -17,9 +17,10 @@ class Signup extends Signin {
 	 */
 	public function __construct( $request ) {
 		try{
-			$this->results = $this->register( $request );
+			$this->register( $request );
+			$this->results = $this->checkLogin( $request );
 		}catch(\Exception $e) {
-			$this->results = true;
+			$this->results = false;
 		}
 	}
 
@@ -39,7 +40,7 @@ class Signup extends Signin {
 			$person->setType( "J" );
 		else
 			$person->setType( "F" );
-		
+
 		$person->post();
 
 		$user = new \Src\Entities\User();
