@@ -188,7 +188,7 @@ class Request {
 		if( is_null( $object ) )
 			$this->response[ "message" ] = gettext( "Erro desconhecido." );
 		elseif( $object === false )
-			$this->response[ "message" ] = gettext( "Serviço não encontrado." );
+			$this->response[ "message" ] = gettext( "Serviço não localizado ou indisponível." );
 		elseif( is_object( $object ) && $object->hasError() )
 			$this->response[ "message" ] = gettext( $object->getError() );
 		else
