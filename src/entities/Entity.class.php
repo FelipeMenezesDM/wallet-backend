@@ -31,6 +31,10 @@ abstract class Entity {
 	public function get( $request = array() ) {
 		$request[ "table" ] = $this->getTableName();
 		$request[ "key" ] = static::KEY_NAME;
+
+		if( !isset( $request[ "joins" ] ) )
+			$request[ "joins" ] = static::JOINS;
+
 		$query = new \Src\Db\Query\Select( $request );
 		$this->error = $query->getError();
 
@@ -175,10 +179,11 @@ abstract class Entity {
 	 */
 	public function getProps() {
 		$vars = array_keys( get_class_vars( get_called_class() ) );
+		$parent = get_parent_class( $this );
 		$return = array();
 
 		foreach( $vars as $var ) {
-			if( property_exists( get_called_class(), $var ) ) {
+			if( property_exists( get_called_class(), $var ) && ( !$parent || !property_exists( $parent, $var ) ) ) {
 				$return[] = $var;
 			}
 		}
