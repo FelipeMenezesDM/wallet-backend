@@ -20,11 +20,11 @@ class Person extends Entity {
 	var $cpf_cnpj;
 	var $person_creation;
 
-	public function setPerson_Id( $person_id ) {
+	public function setPersonId( $person_id ) {
 		$this->person_id = $person_id;
 	}
 
-	public function getPerson_Id() {
+	public function getPersonId() {
 		return $this->person_id;
 	}
 
@@ -52,19 +52,37 @@ class Person extends Entity {
 		return $this->type;
 	}
 
-	public function setCpf_Cnpj( $cpf_cnpj ) {
+	public function setCpfCnpj( $cpf_cnpj ) {
 		$this->cpf_cnpj = $cpf_cnpj;
 	}
 
-	public function getCpf_Cnpj() {
+	public function getCpfCnpj() {
 		return $this->cpf_cnpj;
 	}
 
-	public function setPerson_Creation( $person_creation ) {
+	public function setPersonCreation( $person_creation ) {
 		$this->person_creation = $person_creation;
 	}
 
-	public function getPerson_creation() {
+	public function getPersonCreation() {
 		return $this->person_creation;
+	}
+
+	/**
+	 * Obter pessoa a partir do seu email.
+	 * @param  string  $email Endereço de e-mail para busca.
+	 * @return boolean
+	 */
+	public function getByEmail( $email ) {
+		return $this->get( array( "meta_query" => array( array( "key" => "email", "value" => $email ) ) ) );
+	}
+
+	/**
+	 * Obter pessoa a partir do seu CPF/CNPJ.
+	 * @param  string  $cpfCnpj Número de CPF ou CNPJ para busca.
+	 * @return boolean
+	 */
+	public function getByCpfCnpj( $cpfCnpj ) {
+		return $this->get( array( "meta_query" => array( array( "key" => "cpf_cnpj", "value" => $cpfCnpj ) ) ) );
 	}
 }
