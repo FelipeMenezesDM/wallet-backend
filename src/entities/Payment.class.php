@@ -13,6 +13,7 @@ namespace Src\Entities;
 class Payment extends Entity {
 	CONST KEY_NAME = "payment_id";
 
+	var $payment_id;
 	var $payer;
 	var $payee;
 	var $value;

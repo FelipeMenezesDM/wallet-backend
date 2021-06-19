@@ -40,22 +40,23 @@ class Payment {
 		}
 
 		try{
-			$value = (float) $this->handlerPaymentValue( $value );
+			$value = (float) $this->handlerPaymentValue( $request[ "value" ] );
 		}catch( \Exception $e ) {
 			$this->response[ "message" ] = gettext( "O valor informado está em um formato inválido." );;
 			return $this->resonse;
 		}
 
-		$conn = new \Src\Controllers\Connect();
+		$conn = new \Src\Db\Connect();
 		$conn->connect();
+		$conn->setAutocommit( false );
 		$conn->beginTransaction();
 
 		$payer = new \Src\Entities\Wallet();
-		$payer->setConnection( $connect );
+		$payer->setConnection( $conn );
 		$payer->getByPersonId( $request[ "payer" ] );
 
 		$payee = new \Src\Entities\Wallet();
-		$payee->setConnection( $connect );
+		$payee->setConnection( $conn );
 		$payee->getByPersonId( $request[ "payee" ] );
 
 		if(
@@ -67,6 +68,7 @@ class Payment {
 			$conn->commit();
 			$this->sendNotification();
 			$this->response[ "status" ] = "success";
+			$this->response[ "message" ] = "Seu pagamento foi enviado com sucesso.";
 			return $this->response;
 		}else{
 			$conn->rollBack();
@@ -87,19 +89,19 @@ class Payment {
 
 		if( $value === 0 ) {
 			$error = gettext( "O valor de pagamento informado é inválido." );
-		}elseif( !$payer->getPersonId() ) {
+		}elseif( !$payer->getWalletPersonId() ) {
 			$error = gettext( "O usuário pagador é inválido." );
-		}elseif( !$payee->getPersonId() ) {
+		}elseif( !$payee->getWalletPersonId() ) {
 			$error = gettext( "O usuário receber selecionado é inválido." );
 		}elseif( $payer->getType() !== "F" ) {
 			$error = gettext( "Essa ação não é permitida para o seu tipo de usuário." );
 		}elseif( $payer->getBalance() < $value ) {
-			$error = gettext( "Não há saldo sufiente para está operação." );
-		}elseif( $payer->getPersonId() === $payee->getPersonId() ) {
+			$error = gettext( "Não há saldo sufiente para esta operação." );
+		}elseif( $payer->getWalletPersonId() === $payee->getWalletPersonId() ) {
 			$error = gettext( "Este tipo de operação é inválida." );
 		}
 
-		$this->response[ "message" ] = $erro;
+		$this->response[ "message" ] = $error;
 		return $error;
 	}
 
@@ -119,7 +121,7 @@ class Payment {
 		if( !$payer->put() || !$payee->put() )
 			$error = gettext( "Não foi possível concluir essa operação." );
 
-		$this->response[ "message" ] = $erro;
+		$this->response[ "message" ] = $error;
 		return $error;
 	}
 
@@ -136,14 +138,15 @@ class Payment {
 		$error = false;
 		$payment = new \Src\Entities\Payment();
 		$payment->setConnection( $conn );
-		$payment->setPayer( $payer->getPersonId() );
-		$payment->setPayee( $payee->getPersonId() );
+		$payment->setPaymentId( \Src\Controllers\Utils::getUuid() );
+		$payment->setPayer( $payer->getWalletPersonId() );
+		$payment->setPayee( $payee->getWalletPersonId() );
 		$payment->setValue( $value );
 
 		if( !$payment->post() )
 			$error = gettext( "Não foi possível finalizar a transação." );
 
-		$this->response[ "message" ] = $erro;
+		$this->response[ "message" ] = $error;
 		return $error;
 	}
 
@@ -156,7 +159,7 @@ class Payment {
 		$error = false;
 
 		try{
-			$response = json_decode( file_get_contents( MOCKY_URI_TRANSACTION ) );
+			$response = json_decode( file_get_contents( self::MOCKY_URI_TRANSACTION ) );
 
 			if( $response->message !== "Autorizado" )
 				$error = gettext( "Esta transação não foi autorizada." );
@@ -164,7 +167,7 @@ class Payment {
 			$error = gettext( "Não foi possível acessar a autorização desta transação." );
 		}
 
-		$this->response[ "message" ] = $erro;
+		$this->response[ "message" ] = $error;
 		return $error;
 	}
 
@@ -172,15 +175,15 @@ class Payment {
 		$error = false;
 
 		try{
-			$response = json_decode( file_get_contents( MOCKY_URI_NOTIFICATION ) );
+			$response = json_decode( file_get_contents( self::MOCKY_URI_NOTIFICATION ) );
 
-			if( $response->message !== "Sucesso" )
-				$error = gettext( "Não foi possível enviar a notifacação." );
+			if( $response->message !== "Success" )
+				$error = gettext( "Transação finalizada com sucesso, mas não foi possível enviar a notificação de confirmação." );
 		}catch( \Exception $e ) {
-			$error = gettext( "Não foi possível enviar a notifacação." );
+			$error = gettext( "Transação finalizada com sucesso, mas não foi possível enviar a notificação de confirmação." );
 		}
 
-		$this->response[ "message" ] = $erro;
+		$this->response[ "message" ] = $error;
 		return $error;
 	}
 
@@ -191,6 +194,6 @@ class Payment {
 	 * @return float
 	 */
 	private function handlerPaymentValue( $value ) {
-		return substr( ",", ".", substr( array( " ", "." ), "", $value ) );
+		return str_replace( ",", ".", str_replace( array( " ", "." ), "", $value ) );
 	}
 }

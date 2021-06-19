@@ -18,13 +18,15 @@ class Payee {
 	 */
 	public function getPayees( $request ) {
 		try{
+			error_log(json_encode($request));
 			$query = new \Src\Db\query\Select( array(
 				"table"			=> "person",
 				"key"			=> "person_id",
 				"fields"		=> array( "person_id", "fullname", "username" ),
 				"joins"			=> array(
 					array( "table" => "user", "meta_query" => array( array( "key" => "user_person_id", "column" => "person_id" ) ) )
-				)
+				),
+				"meta_query"	=> array( array( "key" => "person_id", "compare" => "!=", "value" => $request[ "person_id" ] ) )
 			));
 
 			if( $query->hasError() )

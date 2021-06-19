@@ -67,4 +67,22 @@ class Person extends Entity {
 	public function getPersonCreation() {
 		return $this->person_creation;
 	}
+
+	/**
+	 * Obter pessoa a partir do seu email.
+	 * @param  string  $email Endereço de e-mail para busca.
+	 * @return boolean
+	 */
+	public function getByEmail( $email ) {
+		return $this->get( array( "meta_query" => array( array( "key" => "email", "value" => $email ) ) ) );
+	}
+
+	/**
+	 * Obter pessoa a partir do seu CPF/CNPJ.
+	 * @param  string  $cpfCnpj Número de CPF ou CNPJ para busca.
+	 * @return boolean
+	 */
+	public function getByCpfCnpj( $cpfCnpj ) {
+		return $this->get( array( "meta_query" => array( array( "key" => "cpf_cnpj", "value" => $cpfCnpj ) ) ) );
+	}
 }

@@ -84,4 +84,13 @@ class User extends Person {
 
 		return $this->get( array( "meta_query" => $metaQuery ) );
 	}
+
+	/**
+	 * Obter usuário a partir do seu nome de usuário.
+	 * @param  string  $cpfCnpj Número de CPF ou CNPJ para busca.
+	 * @return boolean
+	 */
+	public function getByUsername( $username ) {
+		return $this->get( array( "meta_query" => array( array( "key" => "username", "value" => $username ) ) ) );
+	}
 }

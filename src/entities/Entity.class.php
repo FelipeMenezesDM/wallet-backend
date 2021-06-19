@@ -55,7 +55,7 @@ abstract class Entity {
 		$query = new \Src\Db\Query\Select( $request, null, $this->connection );
 		$this->error = $query->getError();
 
-		if( !$query->hasError() ) {
+		if( !$query->hasError() && $query->getRowsCount() > 0 ) {
 			$this->object = $query;
 			$this->next();
 			return true;
@@ -166,7 +166,7 @@ abstract class Entity {
 	 * @return void
 	 */
 	private function loadProps( $load ) {
-		$props = $this->getProps();
+		$props = $this->getProps( true );
 
 		foreach( $props as $prop ) {
 			$this->setPropValue( $prop, null );
@@ -194,13 +194,13 @@ abstract class Entity {
 	 * Obter as propriedades da entidade.
 	 * @return array
 	 */
-	public function getProps() {
+	public function getProps( $includeParentProps = false ) {
 		$vars = array_keys( get_class_vars( get_called_class() ) );
 		$parent = get_parent_class( $this );
 		$return = array();
 
 		foreach( $vars as $var ) {
-			if( property_exists( get_called_class(), $var ) && ( !$parent || !property_exists( $parent, $var ) ) ) {
+			if( property_exists( get_called_class(), $var ) && ( !$parent || $includeParentProps || !property_exists( $parent, $var ) ) ) {
 				$return[] = $var;
 			}
 		}

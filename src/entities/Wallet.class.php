@@ -10,8 +10,11 @@
 
 namespace Src\Entities;
 
-class Wallet extends Entity {
+class Wallet extends Person {
 	CONST KEY_NAME = "wallet_id";
+	CONST JOINS = array(
+		array( "table" => "person", "meta_query" => array( array( "key" => "wallet_person_id", "column" => "person_id" ) ) )
+	);
 
 	var $wallet_id;
 	var $wallet_person_id;
@@ -48,5 +51,14 @@ class Wallet extends Entity {
 
 	public function getWalletCreation() {
 		return $this->wallet_creation;
+	}
+
+	/**
+	 * Obter pessoa a partir do seu ID.
+	 * @param  string  $personId ID da pessoa.
+	 * @return boolean
+	 */
+	public function getByPersonId( $personId ) {
+		return $this->get( array( "meta_query" => array( array( "key" => "wallet_person_id", "value" => $personId ) ) ) );
 	}
 }

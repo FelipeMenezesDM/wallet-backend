@@ -23,7 +23,13 @@ class Signin {
 
 			if( !is_null( $user->getUserId() ) && password_verify( $request[ "password" ], $user->getPassword() ) ) {
 				$header = array( "typ" => "JWT", "alg" => "HS256" );
-				$payload = array( "id" => $user->getPersonId(), "email" => $user->getEmail(), "type" => $user->getType() );
+				$payload = array(
+					"user_id"	=> $user->getUserId(),
+					"fullname"	=> $user->getFullname(),
+					"person_id" => $user->getPersonId(),
+					"email"		=> $user->getEmail(),
+					"type"		=> $user->getType()
+				);
 
 				$header = json_encode( $header );
 				$payload = json_encode( $payload );
