@@ -30,7 +30,7 @@ class Signin implements Service {
 		return $this->results;
 	}
 
-	private function checkLogin( $request ) {
+	protected function checkLogin( $request ) {
 
 		if( isset( $request[ "email" ] ) && isset( $request[ "password" ] ) ) {
 			$user = new \Src\Entities\User();
@@ -38,7 +38,7 @@ class Signin implements Service {
 
 			if( !is_null( $user->getUserId() ) && password_verify( $request[ "password" ], $user->getPassword() ) ) {
 				$header = array( "typ" => "JWT", "alg" => "HS256" );
-				$payload = array( "id" => $user->getUserId(), "email" => $user->getEmail() );
+				$payload = array( "id" => $user->getPersonId(), "email" => $user->getEmail(), "type" => $user->getType() );
 
 				$header = json_encode( $header );
 				$payload = json_encode( $payload );
