@@ -16,10 +16,4 @@ interface Service {
      * @param array $request Objeto da requisição.
      */
     public function __construct( $request );
-
-    /**
-     * Retorno de resultados obrigatrório.
-     * @return *
-     */
-    public function getResults();
 }

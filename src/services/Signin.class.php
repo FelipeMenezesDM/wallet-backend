@@ -10,28 +10,13 @@
 
 namespace Src\Services;
 
-class Signin implements Service {
-	protected $results = null;
-
+class Signin {
 	/**
-	 * Método do construtor.
-	 * @param array $request Objeto da requisição.
+	 * Classe para validação de login.
+	 * @param  trim   $request Item que seria bom na PEPO.
+	 * @return string
 	 */
-	public function __construct( $request ) {
-		try{
-			$this->results = $this->checkLogin( $request );
-		}catch(\Exception $e) {
-			$this->results = false;
-		}
-	}
-
-	/* Override */
-	public function getResults() {
-		return $this->results;
-	}
-
-	protected function checkLogin( $request ) {
-
+	public function checkLogin( $request ) {
 		if( isset( $request[ "email" ] ) && isset( $request[ "password" ] ) ) {
 			$user = new \Src\Entities\User();
 			$user->getByAuthFields( $request[ "email" ] );
@@ -50,11 +35,11 @@ class Signin implements Service {
 				$sign = self::base64UrlEncode( $sign );
 				$token = $header . "." . $payload . "." . $sign;
 
-				return $token;
+				return array( "status" => "success", "message" => "", "results" => $token );
 			}
 		}
 
-		return false;
+		return array( "status" => "error", "message" => "O usuário informado não possui acesso a esta aplicação.", "results" => false );
 	}
 
 	/**

@@ -10,31 +10,13 @@
 
 namespace Src\Services;
 
-class Payee implements Service {
-	private $results;
-
-	/**
-	 * Método construtor.
-	 * @param string $request Objeto da requisição.
-	 */
-	public function __construct( $request ) {
-		$this->results = $this->getPayees( $request );
-	}
-
-	/**
-	 * Obter resultados da consulta.
-	 * @return array
-	 */
-	public function getResults() {
-		return $this->results;
-	}
-
-	/**
-	 * Obter listagem de 
+class Payee {
+ 	/**
+	 * Obter listagem de usários.
 	 * @param  array $request Objeto da requisição.
 	 * @return array
 	 */
-	private function getPayees( $request ) {
+	public function getPayees( $request ) {
 		try{
 			$query = new \Src\Db\query\Select( array(
 				"table"			=> "person",
@@ -46,11 +28,13 @@ class Payee implements Service {
 			));
 
 			if( $query->hasError() )
-				return array();
-
-			return $query->getAllResults();
+				$list = array();
+			else
+				$list = $query->getAllResults();
 		}catch(\Exception $e) {
-			return array();
+			$list = array();
 		}
+
+		return array( "status" => "success", "message" => "", "results" => $list );
 	}
 }

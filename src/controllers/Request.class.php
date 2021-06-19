@@ -57,8 +57,8 @@ class Request {
 
 		$response = & $this->response;
 		$params = & $this->requestParams;
-		$params = array_intersect_key( \Src\Controllers\Utils::arrayKeyHandler( $requestParams ), array_flip( array( "version", "type", "object" ) ) );
-		$params = array_merge( array( "version" => "", "type" => "", "object" => "" ), $params );
+		$params = array_intersect_key( \Src\Controllers\Utils::arrayKeyHandler( $requestParams ), array_flip( array( "version", "type", "object", "feature" ) ) );
+		$params = array_merge( array( "version" => "", "type" => "", "object" => "", "feature" => "" ), $params );
 		$params = array_map( "strtolower", array_map( "trim", $params ) );
 		$fileName = "error";
 		$isPretty = ( ( isset( $_REQUEST[ "pretty" ] ) && (bool) $_REQUEST[ "pretty" ] ) ? JSON_PRETTY_PRINT : 0 );
@@ -172,19 +172,11 @@ class Request {
 				$this->response[ "last_insert_id" ] = $object->getLastInsertID();
 			break;
 			case "service" : # Requisição de serviços.
-				$service = "Src\Services\\" . $this->requestParams[ "object" ];
-
-				try{
-					$service = new $service( $request );
-					$object = $service->getResults();
-
-					if( !$object ) {
-						$this->response[ "status" ] = "error";
-						$this->response[ "message" ] = null;
-					}else{
-						$this->response[ "results" ] = $object;
-					}
-
+				try{ 
+					$service = "Src\Services\\" . $this->requestParams[ "object" ];
+					$service = new $service();
+					$feature = $this->requestParams[ "feature" ];
+					$this->response = call_user_func_array( array( $service, $feature ), array( $request ) );
 				}catch(\Exception $e) {
 					$object = false;
 				}
@@ -192,13 +184,13 @@ class Request {
 		}
 
 		# Validação do objeto.
-		if( is_null( $object ) )
-			$this->response[ "message" ] = gettext( "Erro desconhecido." );
-		elseif( $object === false )
-			$this->response[ "message" ] = gettext( "Serviço não localizado ou indisponível." );
-		elseif( is_object( $object ) && $object->hasError() )
-			$this->response[ "message" ] = gettext( $object->getError() );
-		else
-			$this->response[ "status" ] = "success";
+		if( $this->requestParams[ "type" ] !== "service" ) {
+			if( is_null( $object ) )
+				$this->response[ "message" ] = gettext( "Erro desconhecido." );
+			elseif( is_object( $object ) && $object->hasError() )
+				$this->response[ "message" ] = gettext( $object->getError() );
+			else
+				$this->response[ "status" ] = "success";
+		}
 	}
 }

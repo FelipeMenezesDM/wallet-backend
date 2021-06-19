@@ -12,19 +12,6 @@ namespace Src\Services;
 
 class Signup extends Signin {
 	/**
-	 * Método do construtor.
-	 * @param array $request Objeto da requisição.
-	 */
-	public function __construct( $request ) {
-		try{
-			$this->register( $request );
-			$this->results = $this->checkLogin( $request );
-		}catch(\Exception $e) {
-			$this->results = false;
-		}
-	}
-
-	/**
 	 * Executar inserção do registro.
 	 * @param  array   $request Objeto da requisoção.
 	 * @return boolean

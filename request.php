@@ -20,6 +20,9 @@ function apiRequest() {
 
 		if( isset( $info[3] ) )
 			$request[ "object" ] = $info[3];
+
+		if( isset( $info[4] ) )
+			$request[ "feature" ] = $info[4];
 	}
 
 	if( isset( $request[ "api" ] ) )
