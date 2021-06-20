@@ -203,3 +203,231 @@ URL: http://localhost/index.php/api/v1.0/service/${servico}/${feature}
 Atualmente o projeto conta com alguns serviços como cadastro de usuários, validação de transação financeira e autenticação de acesso, disponíveis em `\Src\Services`.
 
 ### Parâmetros
+Os parãmetros definidos a seguir são usados na construção das requisições da API e também como parâmetros dos controladores `Select`, `Insert`, `Update` e `Delete`.
+
+### Get
+- **table:** Tabela principal para consulta de dados.
+	- Type: string
+	- Note: também pode ser usada como lista de configurações, com definição do alias e schema da tabela.
+	- Example: `"table" => "teste"` ou `"table" => array( "name" => "teste", "alias" => "TAB01", "schema" => "schema01" )`
+- **fields**: Campos para retorno na consulta.
+	- Type: array
+	- Note: Caso não seja definido, a consulta irá retornar todos os campos de todas as tabelas da consulta.
+- **joins:** Definição das tabelas relacionadas à tabela principal ou entre si.
+	- Type: array
+	- Params:
+		- *table:* Tabela para JOIN.
+			- Type: string
+			- Note: também pode ser usada como lista de configurações, com definição do alias e schema da tabela.
+      - Example: `"table" => "teste"` ou `"table" => array( "name" => "teste", "alias" => "TAB01", "schema" => "schema01" )`
+		- *type:* Tipo do JOIN.
+			- Type: string
+			- Default: INNER
+			- Support: INNER, LEFT, RIGHT e FULL
+		- *meta_query:* Ver a seção especial dos [atributos condicionais](#atributos-condicionais) para entender o funcionamento deste atributo.
+		- *meta_queries:* Ver a seção especial dos [atributos condicionais](#atributos-condicionais) para entender o funcionamento deste atributo.
+- **per_page:** Item de paginação, determina o número de registros que devem ser retornados em cada página.
+	- Type: integer
+	- Default: false
+	- Note: Quando definido como "false", todos os registros da consulta serão retornados.
+- **paged:** Item de paginação, determina qual página deve ser retornada na consulta.
+	- Type: integer
+	- Default: 1
+- **order:** Método de ordenação padrão.
+	- Type: string
+	- Default: ASC
+	- Support: DESC ou ASC
+- **order_by:** Item de ordenação, determina quais campos serão considerados para a ordenação dos resultados, bem como a ordem crescente ou decrescente de forma individual.
+	- Type: array, string
+	- Notes:
+		1. Pode ser informado como string ou lista.
+		1. Caso seja uma lista, a chave do item será o campo e o valor, o método de ordenação.
+		1. Caso seja uma lista e o método de ordenação não seja informado, será usado o método padrão definido pelo atributo "order".
+		1. É possível usar o campo "rownumber" parâmetro de ordenação. Ele representa um valor sequencial de cada registro retornado, levando em consideração o total de registros da consulta.
+	- Example: `COLUMN01 DESC, COLUMN02 ASC` ou `array( "column01", "column02" => "desc", "column03" => "ASC" )` 
+- **group_by:** Item de agrupamento, determina as colunas que serão os parâmetros para agrupamento.
+	- Type: array, string
+	- Notes:
+		1. Pode ser informado como uma string livre ou como uma lista.
+		1. Quando este atributo for informado, o atributo "fields" pode ser deixado em branco para que a API identifique automaticamente quais são os campos referenciados no agrupamento.
+	- Example: `TAB01.COLUMN01, TAB01.COLUMN02` ou `array( "TAB01.COLUMN01", "TAB01.COLUMN02" )`
+- **meta_query:** Ver a seção especial dos [atributos condicionais](#atributos-condicionais) para entender o funcionamento deste atributo.
+- **meta_queries:** Ver a seção especial dos [atributos condicionais](#atributos-condicionais) para entender o funcionamento deste atributo.
+- **unaccent:** Difinir se a comparação de strings deve ou não ignorar acentuação.
+	- Type: boolean
+	- Default: true
+
+### Post
+- **table:** Tabela principal para consulta de dados.
+	- Type: string
+	- Note: também pode ser usada como lista de configurações, com definição do alias e schema da tabela.
+	- Example: `"table" => "teste"` ou `"table" => array( "name" => "teste", "alias" => "TAB01", "schema" => "schema01" )`
+- **item:** Registro único para inserção.
+	- Type: array
+	- Notes:
+		1. Neste atributo, as chaves da lista representam as colunas das tabelas.
+		1. Este atributo pode ser usado juntamente com o atributo "items", porém apenas quando os dois forem compatíveis, isto é, quando as colunas de inserção definidas em um for exatamente igual a do outro.
+	- Example: `"item" => array( "column_01" => 20, "column_02" => "TEXT", "file_01" => "C:/image01.jpg" )`
+- **items:** Lista de registros para inserção.
+	- Type: array
+	- Notes:
+		1. O atributo "item" não será incluído na lista de registros do atributo "items".
+		1. Inserção de identidade será tratada de forma automática.
+	- Example:
+```php
+"items" => array(
+  "columns"	=> array( "column_01", "column_02" ),
+  "records"	=> array(
+    array( 20, "TEXT" ),
+    array( 30, "TEXT" )
+  )
+)
+```
+- **key:** Informar a chave primária da tabela principal.
+	- Type: string
+- **update_duplicate_key:** Definir se deve atualizar o registro, caso este já exista na base.
+	- Type: boolean
+	- Default: true
+
+### Put
+- **table:** Tabela onde os dados serão atualizados.
+	- Type: string
+	- Note: também pode ser usada como lista de configurações, com definição do alias e schema da tabela.
+	- Example: `"table" => "teste"` ou `"table" => array( "name" => "teste", "alias" => "TAB01", "schema" => "schema01" )`
+- **sets:** Lista de colunas e valores que serão atualizadas.
+	- Type: array
+	- Notes:
+		1. Pode ser definida como uma lista simples ou detalhada.
+		1. Na lista simples, o conjunto será formado por chave e valor, onde a chave será o nome da coluna e o valor, o que será atribuído a esta. Neste caso, o valor será sempre tratado como uma string pelo statement, por isso, caso a atribuição seja de uma coluna de uma tabela relacionada, deve ser usado a lista detalhada.
+	- Example:
+```php
+# Lista simples:
+"sets" => array( "column01" => 100, "column02" => "text" )
+
+# Lista detalhada:
+"sets" => array(
+  array(
+    "set" => "column01",
+    "value" => 100
+  ),
+  array(
+    "set" => "column02",
+    "column" => "TAB02.col01"
+  )
+)
+```
+- **key:** Informar a chave primária da tabela principal.
+	- Type: string
+- **meta_query:** Ver a seção especial dos [atributos condicionais](#atributos-condicionais) para entender o funcionamento deste atributo.
+- **meta_queries:** Ver a seção especial dos [atributos condicionais](#atributos-condicionais) para entender o funcionamento deste atributo.
+- **unaccent:** Difinir se a comparação de strings deve ou não ignorar acentuação.
+	- Type: boolean
+	- Default: true
+
+### Delete
+- **table:** Tabela da qual os dados serão removidos.
+	- Type: string
+	- Note: também pode ser usada como lista de configurações, com definição do alias e schema da tabela.
+	- Example: `"table" => "teste"` ou `"table" => array( "name" => "teste", "alias" => "TAB01", "schema" => "schema01" )`
+- **meta_query:** Ver a seção especial dos [atributos condicionais](#atributos-condicionais) para entender o funcionamento deste atributo.
+- **meta_queries:** Ver a seção especial dos [atributos condicionais](#atributos-condicionais) para entender o funcionamento deste atributo.
+- **unaccent:** Difinir se a comparação de strings deve ou não ignorar acentuação.
+	- Type: boolean
+	- Default: true
+
+## Atributos condicionais
+
+Na lista de configurações, estes atributos representam a lista de condições para que a instrução seja executada. Em prática, representam as cláusulas do **WHERE** no SQL.
+Assim como no SQL, estes atributos podem ser usados para instruções de atualização, deleção e consulta, ou seja, pelos controladores Select, Delete e Update.
+É possível definir as condições da instrução de duas formas: a primeira, como o uso do atributo "meta_query", deve ser informada como uma lista de arrays que serão interpretados como um grupo de condições; e a segunda, com o uso do atributo "meta_queries", que pode ser entendida como uma equivalência à "meta_query", porém com um nível a mais, como será explicado a seguir:
+
+- **meta_query:** Grupo de condições para execução de uma instrução.
+	- Type: array
+	- Params:
+		- *key:*
+			- Type: string
+			- Notes:
+				1. Chave de comparação da condição.
+				1. Todo valor informado neste atributo não será tratado como uma string no statement da instrução, pois será subtentido como uma coluna.
+		- *column:*
+			- Type: string
+			- Notes:
+				1. Coluna de comparação em relação ao atributo "key", ideal para instruções que utilizam mais de uma tabela em sua composição, como os JOINs nas instruções de consulta.
+				1. Todo valor informado neste atributo não será tratado como uma string no statement da instrução, pois será subtentido como uma coluna.
+				1. Caso este atributo não seja informado, a API irá usar o atributo "value" para interpretação.
+		- *value:*
+			- Type: ...
+			- Notes:
+				1. Valor de comparação em relação ao atributo "key".
+				1. Quando o atributo "column" for definido, este não será levado em consideração na interpretação.
+		- *compare:*
+			- Type: string
+			- Default: =
+			- Support: =, !=, <>, >, <, >=, <=, IN, NOT IN, IS NULL, IS NOT NULL, EXISTS, NOT EXISTS, BETWEEN, LIKE, LEFT LIKE, RIGHT LIKE, NOT LIKE, NOT LEFT LIKE, NOT RIGHT LIKE,  MATCH_PERCENTAGE e FUZZYSEARCH.
+			- Notes:
+				1. Operador de comparação entre a chave e o valor (ou coluna) da condição.
+				1. Quando os comparadores LIKE, LEFT LIKE, RIGHT LIKE, NOT LIKE, NOT LEFT LIKE e NOT RIGHT LIKE forem utilizados, não é necessário adicionar o "%" no atributo "value" ou "column".
+				1. Quando o atributo BETWEEN for utilizado, o atributo "value" ou "column" deverá ser informado como um array da seguinte forma: `array( "min" => MIN_VALUE, "max" => MAX_VALUE )`, inclusive para datas.
+		- *percentage:*
+			- Type: int
+			- Default: 100
+			- Notes:
+				1. Parâmetro usado exclusivamente pelo tipo de comparação `MATCH_PERCENTAGE`, que determina o percentual de correspondência que uma coluna deve ter quando comparada com uma string ou com outra coluna obtido através da função `FUZZYSEARCH`.
+				1. Quando não definido, o percentual padrão é 100%.
+				1. A comparação sempre será feita por percentuais "maiores ou iguais", nunca por "menores", "iguais" ou "menores ou iguais", já que o comparador padrão para o *MATCH_PERCENTAGE* é o `>=`.
+		- *relation:*
+			- Type: string
+			- Default: AND
+			- Support: AND e OR
+			- Notes:
+				1. Tipo de relação entre as demais condições do grupo.
+				1. A ordem das cláusulas após a interpretação será a mesma que a definida nesta lista.
+	    - Example:
+```php
+array(
+  "meta_query" => array(
+    array(
+      "key" => "column01",
+      "value" => 1
+    ),
+    array(
+      "key" => "column01",
+      "value" => 2,
+      "relation" => "OR"
+    )
+  )
+)
+```
+- **meta_queries:** Lista de grupos de condições para execução de uma instrução.
+	- Type: array
+	- Notes:
+		1. É equivalente ao "meta_query", porém com um nível a mais, para cláusulas que requerem vários grupos de condições.
+		1. Pode ser utilizado juntamente com o "meta_query", que será agregado a este atributo como um grupo com relação "AND".
+	- Example:
+```php
+array(
+  "meta_queries" => array(
+    array(
+      array(
+        "key" => "column01",
+        "value" => 1
+      ),
+      array(
+        "key" => "column01",
+        "value" => 2,
+        "relation" => "OR"
+      )
+    ),
+    array(
+      array(
+        "key" => "column04",
+        "value" => array(
+          "min" => "2019-12-01",
+          "max" => "2019-12-31"
+        ),
+        "compare" => "BETWEEN"
+      )
+    )
+  )
+) # Irá retornar: (column01 = 1 OR column01 = 2) AND column04 BETWEEN '2019-12-01' AND '2019-12-31'
+```
