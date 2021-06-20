@@ -9,7 +9,10 @@
  */
 
 namespace Src\Entities;
-use \Src\Db\Query;
+use \Src\Db\Query\Select;
+use \Src\Db\Query\Insert;
+use \Src\Db\Query\Update;
+use \Src\Db\Query\Delete;
 
 abstract class Entity {
 	/**

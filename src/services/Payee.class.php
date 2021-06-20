@@ -26,7 +26,7 @@ class Payee {
 				"joins"			=> array(
 					array( "table" => "user", "meta_query" => array( array( "key" => "userPersonId", "column" => "personId" ) ) )
 				),
-				"meta_query"	=> array( array( "key" => "personId", "compare" => "!=", "value" => $request[ "person_id" ] ) )
+				"meta_query"	=> array( array( "key" => "personId", "compare" => "!=", "value" => $request[ "personid" ] ) )
 			));
 
 			if( $query->hasError() )

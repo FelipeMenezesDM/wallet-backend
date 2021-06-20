@@ -282,6 +282,11 @@ class Select extends \Src\Db\Controller {
 				$tables[] = $table[ "name" ];
 			}
 		}else{
+			$fields = $this->setts[ "fields" ];
+
+			if( is_string( $fields ) )
+				$fields = explode( ",", $fields );
+
 			foreach( (array) $this->setts[ "fields" ] as $field )
 				$columns[] = $field;
 		}
