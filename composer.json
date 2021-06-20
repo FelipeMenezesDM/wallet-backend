@@ -1,5 +1,6 @@
 {
     "name": "felipemenezesdm/wallet",
+    "description": "Código do backend para a API de consumo da Wallet.",
     "authors": [
         {
             "name": "Felipe Menezes",
