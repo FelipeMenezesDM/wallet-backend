@@ -67,11 +67,11 @@ abstract class Entity {
 
 	/**
 	 * Obter registros a partir do ID.
-	 * @param  string  $id ID para consulta.
+	 * @param  string  $code ID para consulta.
 	 * @return booleam
 	 */
-	public function getById( $id ) {
-		return $this->get( array( "meta_query" => array( array( "key" => static::KEY_NAME, "value" => $id ) ) ) );
+	public function getById( $code ) {
+		return $this->get( array( "meta_query" => array( array( "key" => static::KEY_NAME, "value" => $code ) ) ) );
 	}
 
 	/**
@@ -82,7 +82,7 @@ abstract class Entity {
 	public function post( $request = array() ) {
 		$request[ "table" ] = $this->getTableName();
 		$request[ "key" ] = static::KEY_NAME;
-		$props = $this->getProps();
+		$props = $this->getPropsParent();
 		$item = array();
 
 		foreach( $props as $prop ) {
@@ -195,13 +195,31 @@ abstract class Entity {
 	 * Obter as propriedades da entidade.
 	 * @return array
 	 */
-	public function getProps( $includeParentProps = false ) {
+	public function getProps() {
 		$vars = array_keys( get_class_vars( get_called_class() ) );
 		$parent = get_parent_class( $this );
 		$return = array();
 
 		foreach( $vars as $var ) {
-			if( property_exists( get_called_class(), $var ) && ( !$parent || $includeParentProps || !property_exists( $parent, $var ) ) ) {
+			if( property_exists( get_called_class(), $var ) && ( !$parent || !property_exists( $parent, $var ) ) ) {
+				$return[] = $var;
+			}
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Obter as propriedades da entidade.
+	 * @return array
+	 */
+	public function getPropsParent() {
+		$vars = array_keys( get_class_vars( get_called_class() ) );
+		$parent = get_parent_class( $this );
+		$return = array();
+
+		foreach( $vars as $var ) {
+			if( property_exists( get_called_class(), $var ) ) {
 				$return[] = $var;
 			}
 		}

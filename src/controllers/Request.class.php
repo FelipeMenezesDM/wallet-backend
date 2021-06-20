@@ -72,8 +72,10 @@ class Request {
 			$response[ "items" ] = 0;
 		}
 
+		$message = $this->validateRequest( $params );
+
 		# Validar requisição.
-		if( $message = $this->validateRequest( $params ) )
+		if( $message )
 			$response[ "message" ] = $message;
 
 		# Tentativa de conversão em JSON para testar resposta.

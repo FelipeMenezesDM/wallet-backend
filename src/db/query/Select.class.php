@@ -206,7 +206,6 @@ class Select extends \Src\Db\Controller {
 	 * @return string
 	 */
 	protected function getOrderBy() {
-		$orderBy = "";
 		$defOrder = ( strtoupper( trim( $this->setts[ "order" ] ) ) == "ASC" ? "ASC" : "DESC" );
 
 		# Tratamento de ORDER BY enviado como string.
@@ -234,6 +233,7 @@ class Select extends \Src\Db\Controller {
 	 * @return string
 	 */
 	private function handlerOrderBy(  ) {
+		$orderBy = "";
 		$defOrder = ( strtoupper( trim( $this->setts[ "order" ] ) ) == "ASC" ? "ASC" : "DESC" );
 
 		# Processar lista de parâmetros de ordenação.
@@ -254,7 +254,7 @@ class Select extends \Src\Db\Controller {
 		}
 
 		if( !empty( $orderBy ) )
-			$orderBy = " ORDER BY ${orderBy}";
+			$orderBy = " ORDER BY " . $orderBy;
 
 		return $orderBy;
 	}
@@ -371,7 +371,7 @@ class Select extends \Src\Db\Controller {
 				# Tratamento de binários.
 				if( ( $this->isApi || $this->dataType == "JSON" ) && !empty( $value ) && preg_match( "/BYTEA/", $type ) ) {
 					$mineType = $this->getMimeType( $element[ ( $key ) ] );
-					$element[ ( $key ) ] = "data:${mimeType};base64," . base64_encode( $element[ ( $key ) ] );
+					$element[ ( $key ) ] = "data:" . $mimeType . ";base64," . base64_encode( $element[ ( $key ) ] );
 				}
 			}
 

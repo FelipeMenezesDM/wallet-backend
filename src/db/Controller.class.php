@@ -136,13 +136,13 @@ abstract class Controller {
 		}
 
 		# Definir tipo de instrução.
-		$DMLType = Connect::getStatementType( $this->query );
+		$DmlType = Connect::getStatementType( $this->query );
 
 		# Obter e executar rotinas.
 		if( empty( $this->query ) )
 			\Src\Controllers\Logger::setLogMessage( gettext( "Não é possível executar instruções em branco." ) );
-		elseif( $DMLType != $this->getAllowedDML() )
-			\Src\Controllers\Logger::setLogMessage( sprintf( gettext( "O controlador não suporta a instrução \"%s\"." ), $DMLType ) );
+		elseif( $DmlType != $this->getAllowedDML() )
+			\Src\Controllers\Logger::setLogMessage( sprintf( gettext( "O controlador não suporta a instrução \"%s\"." ), $DmlType ) );
 		else
 			$this->execute();
 	}

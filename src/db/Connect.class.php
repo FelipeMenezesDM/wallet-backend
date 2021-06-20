@@ -324,53 +324,48 @@ class Connect {
 
 	/**
 	 * Executar comando SQL e retornar número de linhas afetadas.
-	 * @param  string  $sql       Script SQL para execução.
-	 * @param  boolean $saveQuery Salvar como última instrução executada.
+	 * @param  string $sql Script SQL para execução.
 	 * @return object
 	 */
-	public function exec( $sql = "", $saveQuery = true ) {
-		return $this->run( $sql, "exec", array(), $saveQuery );
+	public function exec( $sql = "" ) {
+		return $this->run( $sql, "exec", array() );
 	}
 
 	/**
 	 * Executar comando SQL e retornar objeto com os resultados.
-	 * @param  string  $sql       Script SQL para execução.
-	 * @param  boolean $saveQuery Salvar como última instrução executada.
+	 * @param  string  $sql Script SQL para execução.
 	 * @return string
 	 */
-	public function query( $sql = "", $saveQuery = true ) {
-		return $this->run( $sql, "query", array(), $saveQuery );
+	public function query( $sql = "" ) {
+		return $this->run( $sql, "query", array() );
 	}
 
 	/**
 	 * Preparar statement
-	 * @param  string  $sql       Script SQL para execução.
-	 * @param  array   $params    Parâmetros do statement.
-	 * @param  boolean $saveQuery Salvar como última instrução executada.
+	 * @param  string  $sql    Script SQL para execução.
+	 * @param  array   $params Parâmetros do statement.
 	 * @return object
 	 */
-	public function prepare( $sql = "", $params, $saveQuery = true ) {
-		return $this->run( $sql, "prepare", $params, $saveQuery );
+	public function prepare( $sql = "", $params ) {
+		return $this->run( $sql, "prepare", $params );
 	}
 
 	/**
 	 * Execução de comandos SQL por tipo.
 	 * @access private
-	 * @param  string  $sql       Script SQL para execução.
-	 * @param  string  $type      Tipo de execução.
-	 * @param  array   $params    Parâmetros do statement.
-	 * @param  boolean $saveQuery Salvar como última instrução executada.
+	 * @param  string  $sql    Script SQL para execução.
+	 * @param  string  $type   Tipo de execução.
+	 * @param  array   $params Parâmetros do statement.
 	 * @return object
 	 */
-	private function run( $sql, $type, $params = array(), $saveQuery = true ) {
+	private function run( $sql, $type, $params = array() ) {
 		if( is_null( $this->connection ) ) {
 			\Src\Controllers\Logger::setLogMessage( gettext( "A conexão com a base de dados não foi estabelecida." ) );
 			return false;
 		}
 
 		# Armazena a última instrução executada.
-		if( $saveQuery )
-			self::$lastQuery = $sql;
+		self::$lastQuery = $sql;
 
 		$start = ( time() + (double) microtime() );
 		$resultSet = false;
@@ -388,9 +383,11 @@ class Connect {
 						if( is_int( $param ) )
 							break;
 
-						if( ( $countParam = preg_match_all( "/${param}[^_a-zA-Z]*/", $sql ) ) > 1 ) {
-							for( $i = 1; $i < $countParam; $i++ ) {
-								$newParam = "${param}_${i}";
+						$countParam = preg_match_all( "/${param}[^_a-zA-Z]*/", $sql );
+
+						if( $countParam > 1 ) {
+							for( $ind = 1; $ind < $countParam; $ind++ ) {
+								$newParam = "${param}_${ind}";
 								$params[ ( $newParam ) ] = $value;
 								$sql = preg_replace( "/${param}([^_a-zA-Z]*)/", "${newParam}$1", $sql, 1 );
 							}
@@ -415,11 +412,9 @@ class Connect {
 					}
 
 					# Guardar última instrução executada.
-					if( $saveQuery ) {
-						$stmtType = strtolower( $this->getStatementType( $sql ) );
-						self::$lastQuery = $this->handlerStatementParams( $sql, $params );
-						self::$lastQueries[ ( $stmtType ) ] = self::$lastQuery;
-					}
+					$stmtType = strtolower( $this->getStatementType( $sql ) );
+					self::$lastQuery = $this->handlerStatementParams( $sql, $params );
+					self::$lastQueries[ ( $stmtType ) ] = self::$lastQuery;
 
 					# Executar instrução.
 					try{
@@ -499,7 +494,9 @@ class Connect {
 		if( is_null( $this->connection ) )
 			return null;
 
-		if( !( $error = $this->error ) )
+		$error = $this->error;
+
+		if( !$error )
 			$error = $this->connection->errorInfo();
 
 		return $error[2];
@@ -513,7 +510,9 @@ class Connect {
 		if( is_null( $this->connection ) )
 			return false;
 
-		if( !( $error = $this->error ) )
+		$error = $this->error;
+
+		if( !$error )
 			$error = $this->connection->errorInfo();
 
 		# Tratamento de erros desconhecidos.
