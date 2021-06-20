@@ -128,9 +128,19 @@ class Select extends \Src\Db\Controller {
 	 */
 	protected function getJoins() {
 		$query = "";
+		$joins = $this->setts[ "joins" ] ;
+
+		if( is_string( $joins ) ) {
+			try{
+				$joins = json_decode( $joins, true );
+			}catch( \Exception $e ) {
+				$joins = array();
+			}
+		}
 
 		# Listar JOINs da tabela.
-		foreach( $this->setts[ "joins" ] as $join ) {
+		foreach( $joins as $join ) {
+			# Converter joins passados como json.
 			if( !is_array( $join ) )
 				continue;
 
