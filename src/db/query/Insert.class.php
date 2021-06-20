@@ -40,7 +40,7 @@ class Insert extends \Src\Db\Controller {
 		$items = &$this->setts[ "items" ];
 		$key = &$this->setts[ "key" ];
 		$fields = &$this->fields;
-		$items = \Src\Controllers\Utils::arrayMerge( array( "columns" => array(), "records" => array() ), $items );
+		$items = $this->utils->arrayMerge( array( "columns" => array(), "records" => array() ), $items );
 
 		# Adicionar item de inserção individual à lista de itens.
 		if( !empty( $this->setts[ "item" ] ) && is_array( $this->setts[ "item" ] ) ) {
@@ -78,7 +78,6 @@ class Insert extends \Src\Db\Controller {
 			# Listar campos dos registros.
 			foreach( $record as $id => $field ) {
 				$value = ":VAL_SQ_${recordID}_${id}";
-				$column = $items[ "columns" ][ ( $id ) ];
 
 				if( !is_array( $field ) && strtoupper( trim( $field ) ) === "NULL" )
 					$field = null;
@@ -114,7 +113,10 @@ class Insert extends \Src\Db\Controller {
 	/* Override */
 	protected function execute() {
 		$conn = $this->queryConnection;
-		$conn->beginTransaction();
+
+		if( !$conn->getPDOConnection()->inTransaction() )
+			$conn->beginTransaction();
+		
 		$lastInsertID = null;
 
 		# Listar e executar instruções com e sem inserção de identidade.
@@ -122,31 +124,32 @@ class Insert extends \Src\Db\Controller {
 			if( empty( $fields ) )
 				continue;
 
-			$stmt = $conn->prepare( $this->query[ ( $type ) ], $fields );
+			$conn->prepare( $this->query[ ( $type ) ], $fields );
 
 			if( $conn->hasError() ) {
 				$this->error = $conn->getError();
+				break;
 			}else{
-				$conn->commit();
-				$lastInsertID = $conn->getPDOConnection()->lastInsertID();
+				if( $conn->isAutocommit() )
+					$conn->commit();
 
 				# Obter chave do último registro inserido, em caso de inserção de identidade.
 				if( !$lastInsertID )
 					$lastInsertID = $this->lastInsertID;
 			}
-
-			# Parar a execução da após falha.
-			if( $this->error )
-				break;
 		}
 
-		if( !$this->error ) {
-			$this->lastInsertID = $lastInsertID;
-		}else{
-			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível inserir o registro na base de dados." ), $this->error );
-			$conn->rollback();
+		if( $this->error ) {
+			$this->logger->setMessage( gettext( "Não foi possível inserir o registro na base de dados." ), $this->error );
+
+			if( $conn->isAutocommit() )
+				$conn->rollback();
+
 			$this->lastInsertID = null;
+			return;
 		}
+		
+		$this->lastInsertID = $lastInsertID;
 	}
 
 	/* Override */

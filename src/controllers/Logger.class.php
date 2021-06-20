@@ -24,7 +24,7 @@ class Logger {
 	 * @access private
 	 * @var    integer
 	 */
-	private static $execTimeCounter = 0;
+	private $execTimeCounter = 0;
 
 	/**
 	 * Criar e exibir mensagem de erro no log do servidor.
@@ -32,10 +32,10 @@ class Logger {
 	 * @param  string $serverMsg Mensagem reservada do servidor.
 	 * @return void
 	 */
-	public static function setDisplayMessage( $msg = "", $serverMsg = null ) {
+	public function setDisplayMessage( $msg = "", $serverMsg = null ) {
 		$backTrace = array_reverse( debug_backtrace() )[0];
 		
-		self::setLogMessage( $msg, $serverMsg );
+		$this->setLogMessage( $msg, $serverMsg );
 		throw new Exception( $msg . " " . sprintf( gettext( "in %s on line %s" ), $backTrace[ "file" ], $backTrace[ "line" ] ) );
 	}
 
@@ -45,7 +45,7 @@ class Logger {
 	 * @param  integer $argN             Tipo de mensagem: 1 ERROR, 2 WARNING, 3 INFO.
 	 * @return void
 	 */
-	public static function setLogMessage() {
+	public function setLogMessage() {
 		error_log( implode( " ", call_user_func_array( "self::getLogLine", func_get_args() ) ) );
 	}
 
@@ -56,7 +56,7 @@ class Logger {
 	 * @return void
 	 */
 	public function setMessage() {
-		$time = self::$execTimeCounter;
+		$time = $this->execTimeCounter;
 		$hours = str_pad( floor( $time / 3600 ), 2, "0", STR_PAD_LEFT );
 		$minutes = str_pad( floor( ( $time - ( $hours * 3600 ) ) / 60 ), 2, "0", STR_PAD_LEFT );
 		$seconds = str_pad( floor( $time % 60 ), 2, "0" ) . substr( ( $time - (int) $time ), 1, 5 );
@@ -73,7 +73,7 @@ class Logger {
 	 * @param  integer $argN             Tipo de mensagem: 1 ERROR, 2 WARNING, 3 INFO.
 	 * @return string
 	 */
-	private static function getLogLine() {
+	private function getLogLine() {
 		$args = func_get_args();
 		$types = self::LOG_TYPES;
 		$type = $types[ ( self::LOG_ERROR ) ];
@@ -110,7 +110,7 @@ class Logger {
 	 * Definir tempo de execução de uma instrução para exibição no console.
 	 * @param double $time Tempo de execução em milisegundos.
 	 */
-	public static function setExecTime( $time ) {
-		self::$execTimeCounter = $time;
+	public function setExecTime( $time ) {
+		$this->execTimeCounter = $time;
 	}
 }

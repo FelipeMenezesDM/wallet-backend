@@ -9,6 +9,7 @@
  */
 
 namespace Src\Db;
+use \Src\Controllers\Logger;
 
 class Connect {
 	/**
@@ -108,6 +109,20 @@ class Connect {
 	private static $debug = false;
 
 	/**
+	 * Definir se a conexão é de autocommit.
+	 * @access private
+	 * @var    boolean
+	 */
+	private $isAutocommit = true;
+
+	/**
+	 * Gerenciador do log para o console de erros.
+	 * @access protected
+	 * @var    string
+	 */
+	protected $logger = "";
+
+	/**
 	 * Método construtor para objeto de conexão com bases de dados.
 	 * @param  string $database Banco de dados padrão da conexão.
 	 * @param  string $user     Usuário da base de dados/instância.
@@ -117,43 +132,90 @@ class Connect {
 	 * @return void
 	 */
 	public function __construct( $database = null, $user = null, $password = null, $host = null, $port = null ) {
-		# Definir base de dados a partir de constante global.
-		if( is_null( $database ) && defined( "DB_NAME" ) )
-			$database = DB_NAME;
-
-		# Definir usuário da base de dados a partir de constante global.
-		if( is_null( $user ) && defined( "DB_USER" ) )
-			$user = DB_USER;
-
-		# Definir senha de usuário da base de dados a partir de constante global.
-		if( is_null( $password ) && defined( "DB_PASSWORD" ) && !empty( trim( DB_PASSWORD ) ) )
-			$password = DB_PASSWORD;
-		elseif( is_null( $password ) )
-			$password  = "";
-
-		# Definir endereço do servidor de base de dados a partir de constante global.
-		if( is_null( $host ) && defined( "DB_HOST" ) && !empty( trim( DB_HOST ) ) )
-			$host = DB_HOST;
-		elseif( is_null( $host ) || empty( trim( $host ) ) )
-			$host = "localhost";
-
-		# Definir porta do servidor de base de dados a partir de constante global.
-		if( is_null( $port ) && defined( "DB_PORT" ) && !empty( trim( DB_PORT ) ) )
-			$port = DB_PORT;
-		elseif( empty( trim( $port ) ) )
-			$port = NULL;
+		$this->logger = new Logger();
 
 		# Definir gerenciador da base de dados a partir de constante global.
 		if( is_null( self::$manager ) && defined( "DB_MANAGER" ) )
 			$this->setManager( DB_MANAGER );
 
 		# Definir schema.
-		$this->schema = $database;
-		$this->database = $database;
-		$this->user = $user;
-		$this->password = $password;
-		$this->host = $host;
-		$this->port = $port;
+		$this->schema = $this->getDefaultDB( $database );
+		$this->database = $this->schema;
+		$this->user = $this->getDefaultDBUser( $user );
+		$this->password = $this->getDefaultDBPassword( $password );
+		$this->host = $this->getDefaultDBHost( $host );
+		$this->port = $this->getDefaultDBHostPort( $port );
+	}
+
+	/**
+	 * Obter base de dados padrão.
+	 * @param  string $database Nome da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDB( $database ) {
+		# Definir base de dados a partir de constante global.
+		if( is_null( $database ) && defined( "DB_NAME" ) )
+			$database = DB_NAME;
+
+		return $database;
+	}
+
+	/**
+	 * Obter o usuário padrão da base de dados.
+	 * @param  string $dbuser Usuário da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDBUser( $user ) {
+		# Definir usuário da base de dados a partir de constante global.
+		if( is_null( $user ) && defined( "DB_USER" ) )
+			$user = DB_USER;
+
+		return $user;
+	}
+
+	/**
+	 * Obter senha padrão da base de dados.
+	 * @param  string $password Senha da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDBPassword( $password ) {
+		# Definir senha de usuário da base de dados a partir de constante global.
+		if( is_null( $password ) && defined( "DB_PASSWORD" ) && !empty( trim( DB_PASSWORD ) ) )
+			$password = DB_PASSWORD;
+		elseif( is_null( $password ) )
+			$password  = "";
+
+		return $password;
+	}
+
+	/**
+	 * Obter servidor padrão da base de dados.
+	 * @param  string $host Servidor da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDBHost( $host ) {
+		# Definir endereço do servidor de base de dados a partir de constante global.
+		if( is_null( $host ) && defined( "DB_HOST" ) && !empty( trim( DB_HOST ) ) )
+			$host = DB_HOST;
+		elseif( is_null( $host ) || empty( trim( $host ) ) )
+			$host = "localhost";
+
+		return $host;
+	}
+
+	/**
+	 * Obter a porta padrão di servidor da base de dados.
+	 * @param  string $port Porta do servidor da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDBHostPort( $port ) {
+		# Definir porta do servidor de base de dados a partir de constante global.
+		if( is_null( $port ) && defined( "DB_PORT" ) && !empty( trim( DB_PORT ) ) )
+			$port = DB_PORT;
+		elseif( empty( trim( $port ) ) )
+			$port = NULL;
+
+		return $port;
 	}
 
 	/**
@@ -169,18 +231,19 @@ class Connect {
 
 			# Verificar se o gerenciador foi definido.
 			if( empty( $manager ) )
-				\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
+				$this->logger->setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
 
 			# Definir driver do gerenciador.
 			if( !in_array( $manager, self::DRIVERS ) || !class_exists( $driver ) )
-				\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados definido não é suportado." ) );
+				$this->logger->setDisplayMessage( gettext( "O gerenciador de base de dados definido não é suportado." ) );
 			else
 				self::$driver = new $driver();
 
 			self::$manager = $manager;
-		}else{
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
+			return;
 		}
+			
+		$this->logger->setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
 	}
 
 	/**
@@ -291,18 +354,18 @@ class Connect {
 	public function connect() {
 		# Verificar atributos obrigatórios para conexão.
 		if( is_null( self::$manager ) )
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
+			$this->logger->setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
 		elseif( is_null( $this->user ) || is_null( $this->password ) )
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "As credenciais de conexão com a base de dados precisam ser definidas." ) );
+			$this->logger->setDisplayMessage( gettext( "As credenciais de conexão com a base de dados precisam ser definidas." ) );
 
 		try {
 			$this->connection = new \PDO( $this->getDBDriver()->getDNS( $this->host, $this->port, $this->database ), $this->user, $this->password );
 			$this->connection->setAttribute( \PDO::ATTR_CASE, \PDO::CASE_LOWER );
 			$this->getDBDriver()->connectionSettings( $this->connection );
 			$this->getDBDriver()->setDBVersion( $this->connection->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
-		}catch( Exception $e ) {
+		}catch( \Exception $e ) {
 			$this->connection = null;
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
+			$this->logger->setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
 		}
 	}
 
@@ -316,53 +379,48 @@ class Connect {
 
 	/**
 	 * Executar comando SQL e retornar número de linhas afetadas.
-	 * @param  string  $sql       Script SQL para execução.
-	 * @param  boolean $saveQuery Salvar como última instrução executada.
+	 * @param  string $sql Script SQL para execução.
 	 * @return object
 	 */
-	public function exec( $sql = "", $saveQuery = true ) {
-		return $this->run( $sql, "exec", array(), $saveQuery );
+	public function exec( $sql = "" ) {
+		return $this->run( $sql, "exec", array() );
 	}
 
 	/**
 	 * Executar comando SQL e retornar objeto com os resultados.
-	 * @param  string  $sql       Script SQL para execução.
-	 * @param  boolean $saveQuery Salvar como última instrução executada.
+	 * @param  string  $sql Script SQL para execução.
 	 * @return string
 	 */
-	public function query( $sql = "", $saveQuery = true ) {
-		return $this->run( $sql, "query", array(), $saveQuery );
+	public function query( $sql = "" ) {
+		return $this->run( $sql, "query", array() );
 	}
 
 	/**
 	 * Preparar statement
-	 * @param  string  $sql       Script SQL para execução.
-	 * @param  array   $params    Parâmetros do statement.
-	 * @param  boolean $saveQuery Salvar como última instrução executada.
+	 * @param  string  $sql    Script SQL para execução.
+	 * @param  array   $params Parâmetros do statement.
 	 * @return object
 	 */
-	public function prepare( $sql = "", $params, $saveQuery = true ) {
-		return $this->run( $sql, "prepare", $params, $saveQuery );
+	public function prepare( $sql = "", $params ) {
+		return $this->run( $sql, "prepare", $params );
 	}
 
 	/**
 	 * Execução de comandos SQL por tipo.
 	 * @access private
-	 * @param  string  $sql       Script SQL para execução.
-	 * @param  string  $type      Tipo de execução.
-	 * @param  array   $params    Parâmetros do statement.
-	 * @param  boolean $saveQuery Salvar como última instrução executada.
+	 * @param  string  $sql    Script SQL para execução.
+	 * @param  string  $type   Tipo de execução.
+	 * @param  array   $params Parâmetros do statement.
 	 * @return object
 	 */
-	private function run( $sql, $type, $params = array(), $saveQuery = true ) {
+	private function run( $sql, $type, $params = array() ) {
 		if( is_null( $this->connection ) ) {
-			\Src\Controllers\Logger::setLogMessage( gettext( "A conexão com a base de dados não foi estabelecida." ) );
+			$this->logger->setLogMessage( gettext( "A conexão com a base de dados não foi estabelecida." ) );
 			return false;
 		}
 
 		# Armazena a última instrução executada.
-		if( $saveQuery )
-			self::$lastQuery = $sql;
+		self::$lastQuery = $sql;
 
 		$start = ( time() + (double) microtime() );
 		$resultSet = false;
@@ -380,9 +438,11 @@ class Connect {
 						if( is_int( $param ) )
 							break;
 
-						if( ( $countParam = preg_match_all( "/${param}[^_a-zA-Z]*/", $sql ) ) > 1 ) {
-							for( $i = 1; $i < $countParam; $i++ ) {
-								$newParam = "${param}_${i}";
+						$countParam = preg_match_all( "/${param}[^_a-zA-Z]*/", $sql );
+
+						if( $countParam > 1 ) {
+							for( $ind = 1; $ind < $countParam; $ind++ ) {
+								$newParam = "${param}_${ind}";
 								$params[ ( $newParam ) ] = $value;
 								$sql = preg_replace( "/${param}([^_a-zA-Z]*)/", "${newParam}$1", $sql, 1 );
 							}
@@ -407,11 +467,9 @@ class Connect {
 					}
 
 					# Guardar última instrução executada.
-					if( $saveQuery ) {
-						$stmtType = strtolower( $this->getStatementType( $sql ) );
-						self::$lastQuery = $this->handlerStatementParams( $sql, $params );
-						self::$lastQueries[ ( $stmtType ) ] = self::$lastQuery;
-					}
+					$stmtType = strtolower( $this->getStatementType( $sql ) );
+					self::$lastQuery = $this->handlerStatementParams( $sql, $params );
+					self::$lastQueries[ ( $stmtType ) ] = self::$lastQuery;
 
 					# Executar instrução.
 					try{
@@ -419,7 +477,7 @@ class Connect {
 
 						if( $resultSet->errorCode() !== "00000" )
 							$this->error = $resultSet->errorInfo();
-					}catch( Exception $ex ) {
+					}catch( \Exception $ex ) {
 						$this->error = $resultSet->errorInfo();
 						$resultSet = false;
 					}
@@ -431,16 +489,16 @@ class Connect {
 
 			# Imprimir última query executada, caso o modo debug esteja ligado.
 			if( self::$debug && !empty( $this->getLastQuery() ) )
-				\Src\Controllers\Logger::setLogMessage( $this->getLastQuery(), self::LOG_INFO );
-		}catch( Exception $e ) {
+				$this->logger->setLogMessage( $this->getLastQuery(), self::LOG_INFO );
+		}catch( \Exception $e ) {
 			# Imprimir última query executada, caso o modo debug esteja ligado.
 			if( self::$debug )
-				\Src\Controllers\Logger::setLogMessage( $this->getLastQuery() );
+				$this->logger->setLogMessage( $this->getLastQuery() );
 
-			\Src\Controllers\Logger::setLogMessage( gettext( "Falha na execução da instrução." ), $e->getMessage() );
+			$this->logger->setLogMessage( gettext( "Falha na execução da instrução." ), $e->getMessage() );
 		}
 
-		\Src\Controllers\Logger::setExecTime( ( time() + (double) microtime() ) - $start );
+		$this->logger->setExecTime( ( time() + (double) microtime() ) - $start );
 		return $resultSet;
 	}
 
@@ -491,7 +549,9 @@ class Connect {
 		if( is_null( $this->connection ) )
 			return null;
 
-		if( !( $error = $this->error ) )
+		$error = $this->error;
+
+		if( !$error )
 			$error = $this->connection->errorInfo();
 
 		return $error[2];
@@ -505,7 +565,9 @@ class Connect {
 		if( is_null( $this->connection ) )
 			return false;
 
-		if( !( $error = $this->error ) )
+		$error = $this->error;
+
+		if( !$error )
 			$error = $this->connection->errorInfo();
 
 		# Tratamento de erros desconhecidos.
@@ -517,6 +579,22 @@ class Connect {
 		}
 
 		return ( empty( $error[2] ) ? false : (string) $error[0] );
+	}
+
+	/**
+	 * Definir se o campo de dados é autocommit.
+	 * @param boolean $autocommit Definir autocommit para a conexão.
+	 */
+	public function setAutocommit( $autocommit ) {
+		$this->isAutocommit = $autocommit;
+	}
+
+	/**
+	 * Verificar se a conexão é autocommit.
+	 * @return boolean
+	 */
+	public function isAutocommit() {
+		return $this->isAutocommit;
 	}
 
 	/**

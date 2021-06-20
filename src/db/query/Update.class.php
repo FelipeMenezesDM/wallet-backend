@@ -51,7 +51,7 @@ class Update extends \Src\Db\Controller {
 
 		# Quando um update é feito com JOINs, é necessário informar a coluna chave da tabela principal.
 		if( !empty( $joins ) && empty( $key ) ) {
-			\Src\Controllers\Logger::setLogMessage( gettext( "Para executar uma atualização com JOIN entre tabelas, é necessário informar a chave primária da tabela principal." ), \Src\Controllers\Logger::LOG_WARNING );
+			$this->logger->setLogMessage( gettext( "Para executar uma atualização com JOIN entre tabelas, é necessário informar a chave primária da tabela principal." ), $this->logger->LOG_WARNING );
 			return null;
 		}
 
@@ -71,8 +71,7 @@ class Update extends \Src\Db\Controller {
 	 * @param  string    $table Nome da tabela.
 	 * @return array
 	 */
-	protected function getColumns( $table ) {
-		$conn = $this->queryConnection;
+	protected function getColumns() {
 		$sets = &$this->setts[ "sets" ];
 		$setts = array( "set" => "", "column" => "", "value" => "" );
 		$columns = array();
@@ -86,7 +85,7 @@ class Update extends \Src\Db\Controller {
 		# Listar todos os campos para atualização.
 		foreach( $sets as $i => $set ) {
 			if( is_array( $set ) ) {
-				$setItem = \Src\Controllers\Utils::arrayKeyHandler( $set );
+				$setItem = $this->utils->arrayKeyHandler( $set );
 
 				# Tratamento para colunas simples informadas como chave/valor: array( "column" => "valor" ).
 				if( !isset( $setItem[ "set" ] ) && count( $setItem ) === 1 )
@@ -119,11 +118,11 @@ class Update extends \Src\Db\Controller {
 	/* Override */
 	protected function execute() {
 		$conn = $this->queryConnection;
-		$stmt = $conn->prepare( $this->query, $this->fields );
+		$conn->prepare( $this->query, $this->fields );
 
 		if( $conn->hasError() ) {
 			$this->error = $conn->getError();
-			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível concluir a rotina de atualização." ), $this->error );
+			$this->logger->setMessage( gettext( "Não foi possível concluir a rotina de atualização." ), $this->error );
 		}
 	}
 

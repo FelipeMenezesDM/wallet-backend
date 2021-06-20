@@ -10,6 +10,8 @@
  */
 
 namespace Src\Db;
+use \Src\Controllers\Utils;
+use \Src\Controllers\Logger;
 
 abstract class Controller {
 	/**
@@ -89,6 +91,20 @@ abstract class Controller {
 	protected $isApi = false;
 
 	/**
+	 * Utilitários
+	 * @access protected
+	 * @var    object
+	 */
+	protected $utils;
+
+	/**
+	 * Gerenciador de logs do console.
+	 * @access protected
+	 * @var    object
+	 */
+	protected $logger;
+
+	/**
 	 * Contrução do objeto.
 	 * @param  array|string $settsOrQuery Definições do objeto ou instrução livre.
 	 * @param  array        $params       Parâmetros da instrução para criação do statement.
@@ -96,6 +112,9 @@ abstract class Controller {
 	 * @return void
 	 */
 	public function __construct( $settsOrQuery, $params = array(), $connection = null ) {
+		$this->utils = new Utils();
+		$this->logger = new Logger();
+
 		# Identificar requisição da API.
 		if( defined( "REQUEST_FROM_API" ) && REQUEST_FROM_API == 1 )
 			$this->isApi = true;
@@ -114,11 +133,11 @@ abstract class Controller {
 
 		# Objeto inútil se não houver o objeto de conexão.
 		if( is_null( $this->queryConnection ) || !$this->queryConnection->getConnectionStatus() )
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ) );
+			$this->logger->setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ) );
 
 		# Tratamento de atributos de configuração.
 		if( is_array( $settsOrQuery ) ) {
-			$this->setts = \Src\Controllers\Utils::arrayMerge( $this->setts, $settsOrQuery );
+			$this->setts = $this->utils->arrayMerge( $this->setts, $settsOrQuery );
 			$this->setts[ "table" ] = $this->handlerTable( $this->setts[ "table" ] );
 			$this->query = $this->getAutoQuery();
 		}else{
@@ -126,13 +145,13 @@ abstract class Controller {
 		}
 
 		# Definir tipo de instrução.
-		$DMLType = Connect::getStatementType( $this->query );
+		$dmlType = Connect::getStatementType( $this->query );
 
 		# Obter e executar rotinas.
 		if( empty( $this->query ) )
-			\Src\Controllers\Logger::setLogMessage( gettext( "Não é possível executar instruções em branco." ) );
-		elseif( $DMLType != $this->getAllowedDML() )
-			\Src\Controllers\Logger::setLogMessage( sprintf( gettext( "O controlador não suporta a instrução \"%s\"." ), $DMLType ) );
+			$this->logger->setLogMessage( gettext( "Não é possível executar instruções em branco." ) );
+		elseif( $dmlType != $this->getAllowedDML() )
+			$this->logger->setLogMessage( sprintf( gettext( "O controlador não suporta a instrução \"%s\"." ), $dmlType ) );
 		else
 			$this->execute();
 	}
@@ -150,7 +169,7 @@ abstract class Controller {
 		$schema = $this->queryConnection->getSchema();
 		$alias = "TAB" . str_pad( ( count( $this->tables ) + 1 ), 2, "0", STR_PAD_LEFT );
 		$setts = array( "name" => "", "alias" => $alias, "schema" => $schema );
-		$table = \Src\Controllers\Utils::arrayMerge( $setts, $table );
+		$table = $this->utils->arrayMerge( $setts, $table );
 
 		# Adicionar à lista de tabelas usadas pelo controlador.
 		$this->tables[] = $table;
@@ -217,8 +236,25 @@ abstract class Controller {
 		$driver = $this->queryConnection->getDBDriver();
 		$item = 1;
 
+		# Converter metaqueries passados como json.
+		if( is_string( $metaQueries ) ) {
+			try{
+				$metaQueries = json_decode( $metaQueries, true );
+			}catch( \Exception $e ) {
+				$metaQueries = array();
+			}
+		}
+
 		# Listar meta queries multiplas.
 		foreach( (array) $metaQueries as $metaQuery ) {
+			if( is_string( $metaQuery ) ) {
+				try{
+					$metaQuery = json_decode( $metaQuery, true );
+				}catch( \Exception $e ) {
+					$metaQuery = array();
+				}
+			}
+
 			if( !is_array( $metaQuery ) )
 				continue;
 
@@ -241,7 +277,7 @@ abstract class Controller {
 							$val = trim( $val );
 
 						return $val;
-					}, \Src\Controllers\Utils::arrayMerge( $this->metaQuerySetts, $meta )
+					}, $this->utils->arrayMerge( $this->metaQuerySetts, $meta )
 				);
 				$meta[ "compare" ] = ( in_array( strtoupper( $meta[ "compare" ] ), self::COMPARES ) ? strtoupper( $meta[ "compare" ] ) : "=" );
 				$meta[ "relation" ] = ( strtoupper( $meta[ "relation" ] ) == "OR" ? " OR " : " AND " );
@@ -314,8 +350,8 @@ abstract class Controller {
 					}
 					# Comparador de intervalos.
 					elseif( $meta[ "compare" ] == "BETWEEN" ) {
-						$meta[ "value" ] = \Src\Controllers\Utils::arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "value" ] );
-						$meta[ "column" ] = \Src\Controllers\Utils::arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "column" ] );
+						$meta[ "value" ] = $this->utils->arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "value" ] );
+						$meta[ "column" ] = $this->utils->arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "column" ] );
 
 						if( $isColumn ) {
 							$meta[ "value" ] = $meta[ "column" ][ "min" ] . " AND " . $meta[ "column" ][ "max" ];
@@ -432,7 +468,7 @@ abstract class Controller {
 			if( !is_array( $table ) )
 				$table = array( "table" => $table );
 
-			$table = \Src\Controllers\Utils::arrayMerge( $setts, $table );
+			$table = $this->utils->arrayMerge( $setts, $table );
 			$table[ "table" ] = $this->handlerTable( $table[ "table" ] );
 
 			if( !empty( $table[ "table" ][ "name" ] ) ) {
