@@ -9,6 +9,7 @@
  */
 
 namespace Src\Db;
+use \Src\Controllers\Logger;
 
 class Connect {
 	/**
@@ -115,6 +116,13 @@ class Connect {
 	private $isAutocommit = true;
 
 	/**
+	 * Gerenciador do log para o console de erros.
+	 * @access protected
+	 * @var    string
+	 */
+	protected $logger = "";
+
+	/**
 	 * Método construtor para objeto de conexão com bases de dados.
 	 * @param  string $database Banco de dados padrão da conexão.
 	 * @param  string $user     Usuário da base de dados/instância.
@@ -124,6 +132,8 @@ class Connect {
 	 * @return void
 	 */
 	public function __construct( $database = null, $user = null, $password = null, $host = null, $port = null ) {
+		$this->logger = new Logger();
+
 		# Definir base de dados a partir de constante global.
 		if( is_null( $database ) && defined( "DB_NAME" ) )
 			$database = DB_NAME;
@@ -176,11 +186,11 @@ class Connect {
 
 			# Verificar se o gerenciador foi definido.
 			if( empty( $manager ) )
-				\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
+				$this->logger->setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
 
 			# Definir driver do gerenciador.
 			if( !in_array( $manager, self::DRIVERS ) || !class_exists( $driver ) )
-				\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados definido não é suportado." ) );
+				$this->logger->setDisplayMessage( gettext( "O gerenciador de base de dados definido não é suportado." ) );
 			else
 				self::$driver = new $driver();
 
@@ -188,7 +198,7 @@ class Connect {
 			return;
 		}
 			
-		\Src\Controllers\Logger::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
+		$this->logger->setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
 	}
 
 	/**
@@ -299,9 +309,9 @@ class Connect {
 	public function connect() {
 		# Verificar atributos obrigatórios para conexão.
 		if( is_null( self::$manager ) )
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
+			$this->logger->setDisplayMessage( gettext( "O gerenciador de base de dados precisa ser definido." ) );
 		elseif( is_null( $this->user ) || is_null( $this->password ) )
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "As credenciais de conexão com a base de dados precisam ser definidas." ) );
+			$this->logger->setDisplayMessage( gettext( "As credenciais de conexão com a base de dados precisam ser definidas." ) );
 
 		try {
 			$this->connection = new \PDO( $this->getDBDriver()->getDNS( $this->host, $this->port, $this->database ), $this->user, $this->password );
@@ -310,7 +320,7 @@ class Connect {
 			$this->getDBDriver()->setDBVersion( $this->connection->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
 		}catch( \Exception $e ) {
 			$this->connection = null;
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
+			$this->logger->setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ), $e->getMessage() );
 		}
 	}
 
@@ -360,7 +370,7 @@ class Connect {
 	 */
 	private function run( $sql, $type, $params = array() ) {
 		if( is_null( $this->connection ) ) {
-			\Src\Controllers\Logger::setLogMessage( gettext( "A conexão com a base de dados não foi estabelecida." ) );
+			$this->logger->setLogMessage( gettext( "A conexão com a base de dados não foi estabelecida." ) );
 			return false;
 		}
 
@@ -434,16 +444,16 @@ class Connect {
 
 			# Imprimir última query executada, caso o modo debug esteja ligado.
 			if( self::$debug && !empty( $this->getLastQuery() ) )
-				\Src\Controllers\Logger::setLogMessage( $this->getLastQuery(), self::LOG_INFO );
+				$this->logger->setLogMessage( $this->getLastQuery(), self::LOG_INFO );
 		}catch( \Exception $e ) {
 			# Imprimir última query executada, caso o modo debug esteja ligado.
 			if( self::$debug )
-				\Src\Controllers\Logger::setLogMessage( $this->getLastQuery() );
+				$this->logger->setLogMessage( $this->getLastQuery() );
 
-			\Src\Controllers\Logger::setLogMessage( gettext( "Falha na execução da instrução." ), $e->getMessage() );
+			$this->logger->setLogMessage( gettext( "Falha na execução da instrução." ), $e->getMessage() );
 		}
 
-		\Src\Controllers\Logger::setExecTime( ( time() + (double) microtime() ) - $start );
+		$this->logger->setExecTime( ( time() + (double) microtime() ) - $start );
 		return $resultSet;
 	}
 

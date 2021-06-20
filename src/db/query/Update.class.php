@@ -51,7 +51,7 @@ class Update extends \Src\Db\Controller {
 
 		# Quando um update é feito com JOINs, é necessário informar a coluna chave da tabela principal.
 		if( !empty( $joins ) && empty( $key ) ) {
-			\Src\Controllers\Logger::setLogMessage( gettext( "Para executar uma atualização com JOIN entre tabelas, é necessário informar a chave primária da tabela principal." ), \Src\Controllers\Logger::LOG_WARNING );
+			$this->logger->setLogMessage( gettext( "Para executar uma atualização com JOIN entre tabelas, é necessário informar a chave primária da tabela principal." ), $this->logger->LOG_WARNING );
 			return null;
 		}
 
@@ -122,7 +122,7 @@ class Update extends \Src\Db\Controller {
 
 		if( $conn->hasError() ) {
 			$this->error = $conn->getError();
-			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível concluir a rotina de atualização." ), $this->error );
+			$this->logger->setMessage( gettext( "Não foi possível concluir a rotina de atualização." ), $this->error );
 		}
 	}
 

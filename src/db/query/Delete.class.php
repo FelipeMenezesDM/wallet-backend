@@ -59,7 +59,7 @@ class Delete extends \Src\Db\Controller {
 
 		if( $conn->hasError() ) {
 			$this->error = $conn->getError();
-			\Src\Controllers\Logger::setMessage( gettext( "Failed to finish execution of statement due to assembly failure" ), $this->error );
+			$this->logger->setMessage( gettext( "Failed to finish execution of statement due to assembly failure" ), $this->error );
 		}
 	}
 }

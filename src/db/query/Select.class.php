@@ -296,7 +296,7 @@ class Select extends \Src\Db\Controller {
 
 		if( $conn->hasError() ) {
 			$this->error = $conn->getError();
-			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível finalizar a execução da instrução." ), $this->error );
+			$this->logger->setMessage( gettext( "Não foi possível finalizar a execução da instrução." ), $this->error );
 			return;
 		}
 

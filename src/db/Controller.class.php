@@ -11,6 +11,7 @@
 
 namespace Src\Db;
 use \Src\Controllers\Utils;
+use \Src\Controllers\Logger;
 
 abstract class Controller {
 	/**
@@ -97,6 +98,13 @@ abstract class Controller {
 	protected $utils;
 
 	/**
+	 * Gerenciador de logs do console.
+	 * @access protected
+	 * @var    object
+	 */
+	protected $logger;
+
+	/**
 	 * Contrução do objeto.
 	 * @param  array|string $settsOrQuery Definições do objeto ou instrução livre.
 	 * @param  array        $params       Parâmetros da instrução para criação do statement.
@@ -105,6 +113,7 @@ abstract class Controller {
 	 */
 	public function __construct( $settsOrQuery, $params = array(), $connection = null ) {
 		$this->utils = new Utils();
+		$this->logger = new Logger();
 
 		# Identificar requisição da API.
 		if( defined( "REQUEST_FROM_API" ) && REQUEST_FROM_API == 1 )
@@ -124,7 +133,7 @@ abstract class Controller {
 
 		# Objeto inútil se não houver o objeto de conexão.
 		if( is_null( $this->queryConnection ) || !$this->queryConnection->getConnectionStatus() )
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ) );
+			$this->logger->setDisplayMessage( gettext( "Não foi possível estabelecer conexão com a base de dados. Por favor, entre em contato com o administrador do sistema." ) );
 
 		# Tratamento de atributos de configuração.
 		if( is_array( $settsOrQuery ) ) {
@@ -140,9 +149,9 @@ abstract class Controller {
 
 		# Obter e executar rotinas.
 		if( empty( $this->query ) )
-			\Src\Controllers\Logger::setLogMessage( gettext( "Não é possível executar instruções em branco." ) );
+			$this->logger->setLogMessage( gettext( "Não é possível executar instruções em branco." ) );
 		elseif( $DmlType != $this->getAllowedDML() )
-			\Src\Controllers\Logger::setLogMessage( sprintf( gettext( "O controlador não suporta a instrução \"%s\"." ), $DmlType ) );
+			$this->logger->setLogMessage( sprintf( gettext( "O controlador não suporta a instrução \"%s\"." ), $DmlType ) );
 		else
 			$this->execute();
 	}

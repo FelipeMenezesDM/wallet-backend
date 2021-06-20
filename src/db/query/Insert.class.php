@@ -140,7 +140,7 @@ class Insert extends \Src\Db\Controller {
 		}
 
 		if( $this->error ) {
-			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível inserir o registro na base de dados." ), $this->error );
+			$this->logger->setMessage( gettext( "Não foi possível inserir o registro na base de dados." ), $this->error );
 
 			if( $conn->isAutocommit() )
 				$conn->rollback();
