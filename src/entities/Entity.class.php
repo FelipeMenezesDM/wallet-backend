@@ -183,7 +183,12 @@ abstract class Entity {
 	 * @return boolean
 	 */
 	public function next() {
-		if( !is_null( $this->object ) && $load = $this->object->getResults() ) {
+		$load = false;
+
+		if( !is_null( $this->object ) )
+			$load = $this->object->getResults();
+
+		if( $load ) {
 			$this->loadProps( $load );
 			return true;
 		}
@@ -215,7 +220,6 @@ abstract class Entity {
 	 */
 	public function getPropsParent() {
 		$vars = array_keys( get_class_vars( get_called_class() ) );
-		$parent = get_parent_class( $this );
 		$return = array();
 
 		foreach( $vars as $var ) {

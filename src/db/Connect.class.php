@@ -143,8 +143,8 @@ class Connect {
 		$this->database = $this->schema;
 		$this->user = $this->getDefaultDBUser( $user );
 		$this->password = $this->getDefaultDBPassword( $password );
-		$this->host = $host;
-		$this->port = $port;
+		$this->host = $this->getDefaultDBHost( $host );
+		$this->port = $this->getDefaultDBHostPort( $port );
 	}
 
 	/**
@@ -165,7 +165,7 @@ class Connect {
 	 * @param  string $dbuser Usuário da base de dados.
 	 * @return string
 	 */
-	private function getDefaultDBUser( $dbuser ) {
+	private function getDefaultDBUser( $user ) {
 		# Definir usuário da base de dados a partir de constante global.
 		if( is_null( $user ) && defined( "DB_USER" ) )
 			$user = DB_USER;
