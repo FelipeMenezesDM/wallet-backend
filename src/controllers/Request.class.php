@@ -147,7 +147,6 @@ class Request {
 		while( ob_get_level() )
 			ob_end_clean();
 
-		header( "Access-Control-Allow-Origin: *" ); 
 		header( "Access-Control-Allow-Credentials: true");
 		header( "Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS" );
 		header( "Access-Control-Max-Age: 1000" );
