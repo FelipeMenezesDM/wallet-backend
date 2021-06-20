@@ -18,7 +18,6 @@ class Payee {
 	 */
 	public function getPayees( $request ) {
 		try{
-			error_log(json_encode($request));
 			$query = new \Src\Db\query\Select( array(
 				"table"			=> "person",
 				"key"			=> "person_id",

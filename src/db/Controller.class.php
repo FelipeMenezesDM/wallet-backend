@@ -217,8 +217,25 @@ abstract class Controller {
 		$driver = $this->queryConnection->getDBDriver();
 		$item = 1;
 
+		# Converter metaqueries passados como json.
+		if( is_string( $metaQueries ) ) {
+			try{
+				$metaQueries = json_decode( $metaQueries, true );
+			}catch( \Exception $e ) {
+				$metaQueries = array();
+			}
+		}
+
 		# Listar meta queries multiplas.
 		foreach( (array) $metaQueries as $metaQuery ) {
+			if( is_string( $metaQuery ) ) {
+				try{
+					$metaQuery = json_decode( $metaQuery, true );
+				}catch( \Exception $e ) {
+					$metaQuery = array();
+				}
+			}
+
 			if( !is_array( $metaQuery ) )
 				continue;
 
