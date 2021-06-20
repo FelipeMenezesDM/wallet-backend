@@ -9,7 +9,7 @@
  */
 
 namespace Src\Services;
-use \Src\Entities\User as User;
+use \Src\Entities\User;
 
 class Signin {
 	/**
@@ -25,9 +25,9 @@ class Signin {
 			if( !is_null( $user->getUserId() ) && password_verify( $request[ "password" ], $user->getPassword() ) ) {
 				$header = array( "typ" => "JWT", "alg" => "HS256" );
 				$payload = array(
-					"user_id"	=> $user->getUserId(),
+					"userid"	=> $user->getUserId(),
 					"fullname"	=> $user->getFullname(),
-					"person_id" => $user->getPersonId(),
+					"personid" => $user->getPersonId(),
 					"email"		=> $user->getEmail(),
 					"type"		=> $user->getType()
 				);

@@ -237,7 +237,7 @@ class Request {
 					$feature = $this->requestParams[ "feature" ];
 					$this->response = call_user_func_array( array( $service, $feature ), array( $request ) );
 				}catch(\Exception $e) {
-					$object = false;
+					$this->response[ "message" ] = "Serviço não localizado ou indisponível.";
 				}
 			break;
 		}

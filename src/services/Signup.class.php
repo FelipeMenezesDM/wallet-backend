@@ -26,14 +26,14 @@ class Signup extends Signin {
 
 		if( $person->getByEmail( $request[ "email" ] ) ) {
 			return $this->error( "O e-mail informado já está em uso no sistema." );
-		}elseif( $person->getByCpfCnpj( $request[ "cpf_cnpj" ] ) ) {
+		}elseif( $person->getByCpfCnpj( $request[ "cpfcnpj" ] ) ) {
 			return $this->error( "O CPF/CNPJ informado já está em uso no sistema." );
 		}
 
 		$person->setPersonId( $this->getUuid() );
 		$person->setFullname( trim( $request[ "fullname" ] ) );
 		$person->setEmail( trim( $request[ "email" ] ) );
-		$person->setCpfCnpj( trim( $request[ "cpf_cnpj" ] ) );
+		$person->setCpfCnpj( trim( $request[ "cpfcnpj" ] ) );
 
 		if( strlen( $person->getCpfCnpj() ) > 11 )
 			$person->setType( "J" );
