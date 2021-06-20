@@ -9,6 +9,7 @@
  */
 
 namespace Src\Entities;
+use \Src\Db\Query;
 
 abstract class Entity {
 	/**
@@ -52,7 +53,7 @@ abstract class Entity {
 		if( !isset( $request[ "joins" ] ) )
 			$request[ "joins" ] = static::JOINS;
 
-		$query = new \Src\Db\Query\Select( $request, null, $this->connection );
+		$query = new Select( $request, null, $this->connection );
 		$this->error = $query->getError();
 
 		if( !$query->hasError() && $query->getRowsCount() > 0 ) {
@@ -92,7 +93,7 @@ abstract class Entity {
 		}
 
 		$request[ "item" ] = $item;
-		$query = new \Src\Db\Query\Insert( $request, null, $this->connection );
+		$query = new Insert( $request, null, $this->connection );
 		$this->error = $query->getError();
 
 		if( !$query->hasError() ) {
@@ -131,7 +132,7 @@ abstract class Entity {
 		$request[ "key" ] = static::KEY_NAME;
 		$request[ "sets" ] = $sets;
 		$request[ "meta_query" ] = $metaQuery;
-		$query = new \Src\Db\Query\Update( $request, null, $this->connection );
+		$query = new Update( $request, null, $this->connection );
 		$this->error = $query->getError();
 
 		if( !$query->hasError() )
@@ -152,7 +153,7 @@ abstract class Entity {
 			"meta_query" => array( array( "key" => static::KEY_NAME, "value" => $this->getPropValue( static::KEY_NAME ) ) )
 		);
 
-		$query = new \Src\Db\Query\Delete( $request, null, $this->connection );
+		$query = new Delete( $request, null, $this->connection );
 		$this->error = $query->getError();
 
 		if( !$query->hasError() )

@@ -71,7 +71,8 @@ class Signup extends Signin {
 	 * @return string
 	 */
 	private function getUuid() {
-		return Utils::getUuid();
+		$utils = new Utils();
+		return $utils->getUuid();
 	}
 
 	/**

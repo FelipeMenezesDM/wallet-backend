@@ -53,11 +53,13 @@ class Request {
 	 * @param array $requestParams Parâmetros de requsição da API.
 	 */
 	public function __construct( $requestParams = array() ) {
+		$utils = new Utils();
+
 		$this->setRequest();
 		$this->addHeaders();
 		$response = & $this->response;
 		$params = & $this->requestParams;
-		$params = array_intersect_key( Utils::arrayKeyHandler( $requestParams ), array_flip( array( "version", "type", "object", "feature" ) ) );
+		$params = array_intersect_key( $utils->arrayKeyHandler( $requestParams ), array_flip( array( "version", "type", "object", "feature" ) ) );
 		$params = array_merge( array( "version" => "", "type" => "", "object" => "", "feature" => "" ), $params );
 		$params = array_map( "strtolower", array_map( "trim", $params ) );
 		$fileName = "error";

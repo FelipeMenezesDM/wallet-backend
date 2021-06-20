@@ -40,7 +40,7 @@ class Insert extends \Src\Db\Controller {
 		$items = &$this->setts[ "items" ];
 		$key = &$this->setts[ "key" ];
 		$fields = &$this->fields;
-		$items = \Src\Controllers\Utils::arrayMerge( array( "columns" => array(), "records" => array() ), $items );
+		$items = $this->utils->arrayMerge( array( "columns" => array(), "records" => array() ), $items );
 
 		# Adicionar item de inserção individual à lista de itens.
 		if( !empty( $this->setts[ "item" ] ) && is_array( $this->setts[ "item" ] ) ) {

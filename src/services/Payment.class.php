@@ -13,7 +13,7 @@ namespace Src\Services;
 use \Src\Db as Db;
 use \Src\Db\Query as Query;
 use \Src\Entities as Entities;
-use \Src\Controllers as Controllers;
+use \Src\Controllers\Utils;
 
 class Payment {
 	/**
@@ -141,9 +141,10 @@ class Payment {
 	 */
 	private function validateTransactionHistory( $payer, $payee, $value, $conn ) {
 		$error = false;
+		$utils = new Utils();
 		$payment = new Entities\Payment();
 		$payment->setConnection( $conn );
-		$payment->setPaymentId( Controllers\Utils::getUuid() );
+		$payment->setPaymentId( $utils->getUuid() );
 		$payment->setPayer( $payer->getWalletPersonId() );
 		$payment->setPayee( $payee->getWalletPersonId() );
 		$payment->setValue( $value );

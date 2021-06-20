@@ -10,6 +10,7 @@
  */
 
 namespace Src\Db;
+use \Src\Controllers\Utils;
 
 abstract class Controller {
 	/**
@@ -89,6 +90,13 @@ abstract class Controller {
 	protected $isApi = false;
 
 	/**
+	 * Utilitários
+	 * @access protected
+	 * @var    object
+	 */
+	protected $utils;
+
+	/**
 	 * Contrução do objeto.
 	 * @param  array|string $settsOrQuery Definições do objeto ou instrução livre.
 	 * @param  array        $params       Parâmetros da instrução para criação do statement.
@@ -96,6 +104,8 @@ abstract class Controller {
 	 * @return void
 	 */
 	public function __construct( $settsOrQuery, $params = array(), $connection = null ) {
+		$this->utils = new Utils();
+
 		# Identificar requisição da API.
 		if( defined( "REQUEST_FROM_API" ) && REQUEST_FROM_API == 1 )
 			$this->isApi = true;
@@ -118,7 +128,7 @@ abstract class Controller {
 
 		# Tratamento de atributos de configuração.
 		if( is_array( $settsOrQuery ) ) {
-			$this->setts = \Src\Controllers\Utils::arrayMerge( $this->setts, $settsOrQuery );
+			$this->setts = $this->utils->arrayMerge( $this->setts, $settsOrQuery );
 			$this->setts[ "table" ] = $this->handlerTable( $this->setts[ "table" ] );
 			$this->query = $this->getAutoQuery();
 		}else{
@@ -150,7 +160,7 @@ abstract class Controller {
 		$schema = $this->queryConnection->getSchema();
 		$alias = "TAB" . str_pad( ( count( $this->tables ) + 1 ), 2, "0", STR_PAD_LEFT );
 		$setts = array( "name" => "", "alias" => $alias, "schema" => $schema );
-		$table = \Src\Controllers\Utils::arrayMerge( $setts, $table );
+		$table = $this->utils->arrayMerge( $setts, $table );
 
 		# Adicionar à lista de tabelas usadas pelo controlador.
 		$this->tables[] = $table;
@@ -258,7 +268,7 @@ abstract class Controller {
 							$val = trim( $val );
 
 						return $val;
-					}, \Src\Controllers\Utils::arrayMerge( $this->metaQuerySetts, $meta )
+					}, $this->utils->arrayMerge( $this->metaQuerySetts, $meta )
 				);
 				$meta[ "compare" ] = ( in_array( strtoupper( $meta[ "compare" ] ), self::COMPARES ) ? strtoupper( $meta[ "compare" ] ) : "=" );
 				$meta[ "relation" ] = ( strtoupper( $meta[ "relation" ] ) == "OR" ? " OR " : " AND " );
@@ -331,8 +341,8 @@ abstract class Controller {
 					}
 					# Comparador de intervalos.
 					elseif( $meta[ "compare" ] == "BETWEEN" ) {
-						$meta[ "value" ] = \Src\Controllers\Utils::arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "value" ] );
-						$meta[ "column" ] = \Src\Controllers\Utils::arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "column" ] );
+						$meta[ "value" ] = $this->utils->arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "value" ] );
+						$meta[ "column" ] = $this->utils->arrayMerge( array( "min" => "", "max" => "" ), (array) $meta[ "column" ] );
 
 						if( $isColumn ) {
 							$meta[ "value" ] = $meta[ "column" ][ "min" ] . " AND " . $meta[ "column" ][ "max" ];
@@ -449,7 +459,7 @@ abstract class Controller {
 			if( !is_array( $table ) )
 				$table = array( "table" => $table );
 
-			$table = \Src\Controllers\Utils::arrayMerge( $setts, $table );
+			$table = $this->utils->arrayMerge( $setts, $table );
 			$table[ "table" ] = $this->handlerTable( $table[ "table" ] );
 
 			if( !empty( $table[ "table" ][ "name" ] ) ) {

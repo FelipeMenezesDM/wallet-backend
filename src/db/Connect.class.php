@@ -185,9 +185,10 @@ class Connect {
 				self::$driver = new $driver();
 
 			self::$manager = $manager;
-		}else{
-			\Src\Controllers\Logger::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
+			return;
 		}
+			
+		\Src\Controllers\Logger::setDisplayMessage( gettext( "Um gerenciador de base de dados já está em uso." ) );
 	}
 
 	/**

@@ -110,7 +110,7 @@ class Select extends \Src\Db\Controller {
 		$tableName = $table[ "schema" ] . "." . $table[ "name" ] . " AS " . $table[ "alias" ];
 
 		# Tratamento para ordenação com número da linha.
-		$orders = \Src\Controllers\Utils::arrayKeyHandler( $this->setts[ "order_by" ] );
+		$orders = $this->utils->arrayKeyHandler( $this->setts[ "order_by" ] );
 		$reverseOrder = ( array_key_exists( "rownumber", $orders ) && ( strtoupper( trim( $orders[ "rownumber" ] ) ) == "DESC" ) );
 
 		return $conn->getDBDriver()->getSelectStatement( $tableName, $columns, $joins, $queries, $groupBy, $orderBy, $reverseOrder, $perPage, $offset );
@@ -144,7 +144,7 @@ class Select extends \Src\Db\Controller {
 			if( !is_array( $join ) )
 				continue;
 
-			$join = \Src\Controllers\Utils::arrayMerge( $this->joinSetts, $join );
+			$join = $this->utils->arrayMerge( $this->joinSetts, $join );
 			$join[ "type" ] = ( strtoupper( trim( $join[ "type" ] ) ) );
 			
 			$table = $this->handlerTable( $join[ "table" ] );

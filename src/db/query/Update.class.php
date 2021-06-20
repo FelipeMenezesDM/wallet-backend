@@ -86,7 +86,7 @@ class Update extends \Src\Db\Controller {
 		# Listar todos os campos para atualização.
 		foreach( $sets as $i => $set ) {
 			if( is_array( $set ) ) {
-				$setItem = \Src\Controllers\Utils::arrayKeyHandler( $set );
+				$setItem = $this->utils->arrayKeyHandler( $set );
 
 				# Tratamento para colunas simples informadas como chave/valor: array( "column" => "valor" ).
 				if( !isset( $setItem[ "set" ] ) && count( $setItem ) === 1 )
@@ -119,7 +119,7 @@ class Update extends \Src\Db\Controller {
 	/* Override */
 	protected function execute() {
 		$conn = $this->queryConnection;
-		$stmt = $conn->prepare( $this->query, $this->fields );
+		$conn->prepare( $this->query, $this->fields );
 
 		if( $conn->hasError() ) {
 			$this->error = $conn->getError();
