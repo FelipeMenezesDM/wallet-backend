@@ -8,6 +8,19 @@ Para usar este projeto, é necessário ter instalado em sua máquina:
 - PHP 5.3.0 ou superior
 - PostgreSQL 8 ou superior
 
+## Estrutura do projeto
+```
+.
+├── src/  
+│   ├── controllers  
+│   ├── db/  
+│   │   └── query  
+│   ├── drivers  
+│   ├── entities  
+│   └── services  
+└── test  
+```
+
 ## Conteúdo
 - [Instalação](#instalação)
 - [API/REST](apirest)
@@ -32,7 +45,7 @@ Para usar este projeto, é necessário ter instalado em sua máquina:
 
 A instalação deste projeto é feita de forma automatizada durante a instalação do [Wallet (Docker)](https://github.com/FelipeMenezesDM/wallet-docker). Para executar a instalação, siga as etapas abaixo.
 
-1. Antes de iniciar a instalação do projeto, acesse este link para obter uma cópia do backup da base de dados Postgre.
+1. Antes de iniciar a instalação do projeto, [acesse este link](https://drive.google.com/drive/folders/1DORdzzBNaIR3b_JoZyhBsT5EXyudyFZM?usp=sharing) para obter uma cópia do backup da base de dados Postgre.
 2. Faça o clone deste projeto executando o comando abaixo no diretório de aplicações do seu servidor php:
   ```bash
   git clone https://github.com/FelipeMenezesDM/wallet-backend.git
