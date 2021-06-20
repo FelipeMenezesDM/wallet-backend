@@ -10,6 +10,11 @@
 
 namespace Src\Services;
 
+use \Src\Db as Db;
+use \Src\Db\Query as Query;
+use \Src\Entities as Entities;
+use \Src\Controllers as Controllers;
+
 class Payment {
 	/**
 	 * Constantes auxiliares.
@@ -46,16 +51,16 @@ class Payment {
 			return $this->resonse;
 		}
 
-		$conn = new \Src\Db\Connect();
+		$conn = new Db\Connect();
 		$conn->connect();
 		$conn->setAutocommit( false );
 		$conn->beginTransaction();
 
-		$payer = new \Src\Entities\Wallet();
+		$payer = new Entities\Wallet();
 		$payer->setConnection( $conn );
 		$payer->getByPersonId( $request[ "payer" ] );
 
-		$payee = new \Src\Entities\Wallet();
+		$payee = new Entities\Wallet();
 		$payee->setConnection( $conn );
 		$payee->getByPersonId( $request[ "payee" ] );
 
@@ -70,10 +75,10 @@ class Payment {
 			$this->response[ "status" ] = "success";
 			$this->response[ "message" ] = "Seu pagamento foi enviado com sucesso.";
 			return $this->response;
-		}else{
-			$conn->rollBack();
-			return $this->response;
 		}
+			
+		$conn->rollBack();
+		return $this->response;
 	}
 
 	/**
@@ -136,9 +141,9 @@ class Payment {
 	 */
 	private function validateTransactionHistory( $payer, $payee, $value, $conn ) {
 		$error = false;
-		$payment = new \Src\Entities\Payment();
+		$payment = new Entities\Payment();
 		$payment->setConnection( $conn );
-		$payment->setPaymentId( \Src\Controllers\Utils::getUuid() );
+		$payment->setPaymentId( Controllers\Utils::getUuid() );
 		$payment->setPayer( $payer->getWalletPersonId() );
 		$payment->setPayee( $payee->getWalletPersonId() );
 		$payment->setValue( $value );

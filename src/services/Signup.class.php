@@ -10,6 +10,11 @@
 
 namespace Src\Services;
 
+use \Src\Entities\Person;
+use \Src\Entities\User;
+use \Src\Entities\Wallet;
+use \Src\Controllers\Utils;
+
 class Signup extends Signin {
 	/**
 	 * Executar inserção do registro.
@@ -17,7 +22,7 @@ class Signup extends Signin {
 	 * @return boolean
 	 */
 	public function register( $request ) {
-		$person = new \Src\Entities\Person();
+		$person = new Person();
 
 		if( $person->getByEmail( $request[ "email" ] ) ) {
 			return $this->error( "O e-mail informado já está em uso no sistema." );
@@ -37,7 +42,7 @@ class Signup extends Signin {
 
 		$person->post();
 
-		$user = new \Src\Entities\User();
+		$user = new User();
 
 		if( $user->getByUsername( $request[ "username" ] ) ) {
 			return $this->error( "O nome de usuário informado já está em uso no sistema." );
@@ -49,7 +54,7 @@ class Signup extends Signin {
 		$user->setPassword( password_hash( trim( $request[ "password" ] ), PASSWORD_DEFAULT ) );
 		$user->post();
 
-		$wallet = new \Src\Entities\Wallet();
+		$wallet = new Wallet();
 		$wallet->setWalletId( $this->getUuid() );
 		$wallet->setWalletPersonId( $person->getPersonId() );
 		$wallet->setBalance(0);
@@ -66,7 +71,7 @@ class Signup extends Signin {
 	 * @return string
 	 */
 	private function getUuid() {
-		return \Src\Controllers\Utils::getUuid();
+		return Utils::getUuid();
 	}
 
 	/**

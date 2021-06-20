@@ -9,6 +9,7 @@
  */
 
 namespace Src\Services;
+use \Src\Entities\User as User;
 
 class Signin {
 	/**
@@ -18,7 +19,7 @@ class Signin {
 	 */
 	public function checkLogin( $request ) {
 		if( isset( $request[ "email" ] ) && isset( $request[ "password" ] ) ) {
-			$user = new \Src\Entities\User();
+			$user = new User();
 			$user->getByAuthFields( $request[ "email" ] );
 
 			if( !is_null( $user->getUserId() ) && password_verify( $request[ "password" ], $user->getPassword() ) ) {
@@ -34,18 +35,18 @@ class Signin {
 				$header = json_encode( $header );
 				$payload = json_encode( $payload );
 
-				$header = self::base64UrlEncode( $header );
-				$payload = self::base64UrlEncode( $payload );
+				$header = $this->base64UrlEncode( $header );
+				$payload = $this->base64UrlEncode( $payload );
 
 				$sign = hash_hmac( "sha256", $header . "." . $payload, OKTASECRET, true );
-				$sign = self::base64UrlEncode( $sign );
+				$sign = $this->base64UrlEncode( $sign );
 				$token = $header . "." . $payload . "." . $sign;
 
 				return array( "status" => "success", "message" => "", "results" => $token );
 			}
 		}
 
-		return array( "status" => "error", "message" => "O usuário informado não possui acesso a esta aplicação.", "results" => false );
+		return array( "status" => "error", "message" => "Usuário ou senha inválidos.", "results" => false );
 	}
 
 	/**
@@ -53,7 +54,7 @@ class Signin {
 	 * @param  string $data Conteúdo para versão.
 	 * @return string
 	 */
-	private static function base64UrlEncode( $data ) {
+	private function base64UrlEncode( $data ) {
 		$b64 = base64_encode($data);
 
 		if( $b64 === false )

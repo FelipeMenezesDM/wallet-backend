@@ -71,7 +71,8 @@ class Request {
 		}
 
 		# Validar requisição.
-		$response[ "message" ] = $this->validateRequest( $params );
+		if( $message = $this->validateRequest( $params ) )
+			$response[ "message" ] = $message;
 
 		# Tentativa de conversão em JSON para testar resposta.
 		try{
@@ -185,7 +186,7 @@ class Request {
 		}
 
 		$this->processRequest();
-		return "";
+		return false;
 	}
 
 	/**
