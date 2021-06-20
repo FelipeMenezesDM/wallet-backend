@@ -55,7 +55,7 @@ class Delete extends \Src\Db\Controller {
 	/* Override */
 	protected function execute() {
 		$conn = $this->queryConnection;
-		$stmt = $conn->prepare( $this->query, $this->fields );
+		$conn->prepare( $this->query, $this->fields );
 
 		if( $conn->hasError() ) {
 			$this->error = $conn->getError();

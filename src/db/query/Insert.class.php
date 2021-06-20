@@ -78,7 +78,6 @@ class Insert extends \Src\Db\Controller {
 			# Listar campos dos registros.
 			foreach( $record as $id => $field ) {
 				$value = ":VAL_SQ_${recordID}_${id}";
-				$column = $items[ "columns" ][ ( $id ) ];
 
 				if( !is_array( $field ) && strtoupper( trim( $field ) ) === "NULL" )
 					$field = null;
@@ -125,36 +124,32 @@ class Insert extends \Src\Db\Controller {
 			if( empty( $fields ) )
 				continue;
 
-			$stmt = $conn->prepare( $this->query[ ( $type ) ], $fields );
+			$conn->prepare( $this->query[ ( $type ) ], $fields );
 
 			if( $conn->hasError() ) {
 				$this->error = $conn->getError();
+				break;
 			}else{
 				if( $conn->isAutocommit() )
 					$conn->commit();
-
-				// $lastInsertID = $conn->getPDOConnection()->lastInsertID();
 
 				# Obter chave do último registro inserido, em caso de inserção de identidade.
 				if( !$lastInsertID )
 					$lastInsertID = $this->lastInsertID;
 			}
-
-			# Parar a execução da após falha.
-			if( $this->error )
-				break;
 		}
 
-		if( !$this->error ) {
-			$this->lastInsertID = $lastInsertID;
-		}else{
+		if( $this->error ) {
 			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível inserir o registro na base de dados." ), $this->error );
 
 			if( $conn->isAutocommit() )
 				$conn->rollback();
 
 			$this->lastInsertID = null;
+			return;
 		}
+		
+		$this->lastInsertID = $lastInsertID;
 	}
 
 	/* Override */

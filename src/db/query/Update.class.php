@@ -71,8 +71,7 @@ class Update extends \Src\Db\Controller {
 	 * @param  string    $table Nome da tabela.
 	 * @return array
 	 */
-	protected function getColumns( $table ) {
-		$conn = $this->queryConnection;
+	protected function getColumns() {
 		$sets = &$this->setts[ "sets" ];
 		$setts = array( "set" => "", "column" => "", "value" => "" );
 		$columns = array();

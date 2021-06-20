@@ -216,7 +216,7 @@ class Request {
 				$this->response[ "fields" ] = array_keys( $object->getColumnsMeta() );
 				$this->response[ "total" ] = $object->getTotalRowsCount();
 				$this->response[ "items" ] = $object->getRowsCount();
-				$this->response[ "results" ] = $object->getAllResults( true );
+				$this->response[ "results" ] = $object->getAllResults();
 			break;
 			case "delete" : # Requisição de remoção.
 				$object = new Query\Delete( $request );

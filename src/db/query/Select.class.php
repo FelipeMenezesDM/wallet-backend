@@ -211,6 +211,7 @@ class Select extends \Src\Db\Controller {
 
 		# Tratamento de ORDER BY enviado como string.
 		if( !is_array( $this->setts[ "order_by" ] ) ) {
+			$matches = array();
 			$orderByColumns = explode( ",", $this->setts[ "order_by" ] );
 			$this->setts[ "order_by" ] = array();
 
@@ -223,6 +224,17 @@ class Select extends \Src\Db\Controller {
 					$this->setts[ "order_by" ][ trim( $matches[1][0] ) ] = $matches[2][0];
 			}
 		}
+
+		return $this->handlerOrderBy();
+	}
+
+	/**
+	 * Tratamento para o order by.
+	 * @access private
+	 * @return string
+	 */
+	private function handlerOrderBy(  ) {
+		$defOrder = ( strtoupper( trim( $this->setts[ "order" ] ) ) == "ASC" ? "ASC" : "DESC" );
 
 		# Processar lista de parâmetros de ordenação.
 		foreach( $this->setts[ "order_by" ] as $param => $order ) {
@@ -270,7 +282,7 @@ class Select extends \Src\Db\Controller {
 				$tables[] = $table[ "name" ];
 			}
 		}else{
-			foreach( (array) $this->setts[ "fields" ] as $alias => $field )
+			foreach( (array) $this->setts[ "fields" ] as $field )
 				$columns[] = $field;
 		}
 
@@ -282,33 +294,35 @@ class Select extends \Src\Db\Controller {
 		$conn = $this->queryConnection;
 		$stmt = $conn->prepare( $this->query, $this->fields );
 
-		if( !$conn->hasError() ) {
-			$this->resultSet = $stmt->fetchAll( \PDO::FETCH_ASSOC );
-
-			# Definir número total de resultados após execução da instução.
-			if( isset( $this->resultSet[0][ "foundrows" ] ) )
-				$this->totalRows = (int) $this->resultSet[0][ "foundrows" ];
-
-			$this->resultRows = count( (array) $this->resultSet );
-
-			for( $i = 0; $i < $stmt->columnCount(); $i++ ) {
-				$meta = $stmt->getColumnMeta( $i );
-				$type = $meta[ "native_type" ];
-				$name = strtolower( $meta[ "name" ] );
-
-				if( $name == "foundrows" )
-					continue;
-
-				$this->columns[ ( $name ) ] = strtoupper( $type );
-			}
-		}else{
+		if( $conn->hasError() ) {
 			$this->error = $conn->getError();
 			\Src\Controllers\Logger::setMessage( gettext( "Não foi possível finalizar a execução da instrução." ), $this->error );
+			return;
+		}
+
+		$this->resultSet = $stmt->fetchAll( \PDO::FETCH_ASSOC );
+
+		# Definir número total de resultados após execução da instução.
+		if( isset( $this->resultSet[0][ "foundrows" ] ) )
+			$this->totalRows = (int) $this->resultSet[0][ "foundrows" ];
+
+		$this->resultRows = count( (array) $this->resultSet );
+
+		for( $i = 0; $i < $stmt->columnCount(); $i++ ) {
+			$meta = $stmt->getColumnMeta( $i );
+			$type = $meta[ "native_type" ];
+			$name = strtolower( $meta[ "name" ] );
+
+			if( $name == "foundrows" )
+				continue;
+
+			$this->columns[ ( $name ) ] = strtoupper( $type );
 		}
 	}
 
 	/**
 	 * Verificar se a execução da instrução retornou resultados.
+	 * @access private
 	 * @return boolean
 	 */
 	public function hasResults() {
@@ -341,10 +355,9 @@ class Select extends \Src\Db\Controller {
 
 	/**
 	 * Buscar próxima linha.
-	 * @param  boolean $isApiRequest Identificar requisições para API.
 	 * @return object
 	 */
-	public function getResults( $isApiRequest = false ) {
+	public function getResults() {
 		if( !empty( $this->resultSet ) ) {
 			$element = array_shift( $this->resultSet );
 
@@ -356,16 +369,8 @@ class Select extends \Src\Db\Controller {
 					$element[ ( $key ) ] = $this->getBlob( $value );
 
 				# Tratamento de binários.
-				if( ( $isApiRequest || $this->dataType == "JSON" ) && !empty( $value ) && preg_match( "/BYTEA/", $type ) ) {
-					# Obter mime-type do binário.
-					try {
-						$finfo = finfo_open();
-						$mimeType = finfo_buffer( $finfo, $element[ ( $key ) ], FILEINFO_MIME_TYPE );
-						finfo_close( $finfo );
-					}catch( \Exception $e ) {
-						$mimeType = "none";
-					}
-
+				if( ( $this->isApi || $this->dataType == "JSON" ) && !empty( $value ) && preg_match( "/BYTEA/", $type ) ) {
+					$mineType = $this->getMimeType( $element[ ( $key ) ] );
 					$element[ ( $key ) ] = "data:${mimeType};base64," . base64_encode( $element[ ( $key ) ] );
 				}
 			}
@@ -373,35 +378,55 @@ class Select extends \Src\Db\Controller {
 			if( isset( $element[ "foundrows" ] ) )
 				unset( $element[ "foundrows" ] );
 
-			# Converter dados para o formato definido em setDatType().
-			if( $this->dataType == "OBJECT" )
-				$element = (object) $element;
-			elseif( $this->dataType == "JSON" )
-				$element = json_encode( $element );
-
-			return $element;
+			return $this->getElement( $this->dataType, $element );
 		}
 
 		return false;
 	}
 
 	/**
+	 * Obter elemento em um formato de acordo com a requisição.
+	 * @param  string $dataType Tipo do arquivo.
+	 * @param  array  $element  Elemento base.
+	 * @return string
+	 */
+	private function getElement( $dataType, $element ) {
+		# Converter dados para o formato definido em setDatType().
+		if( $dataType == "OBJECT" )
+			$element = (object) $element;
+		elseif( $dataType == "JSON" )
+			$element = json_encode( $element );
+
+		return $element;
+	}
+
+	/**
+	 * Obter Mimetype a partir de um objeto.
+	 * @param  object $object Objeto de referência.
+	 * @return string
+	 */
+	private function getMimeType( $object ) {
+		try {
+			$finfo = finfo_open();
+			$mimeType = finfo_buffer( $finfo, $object, FILEINFO_MIME_TYPE );
+			finfo_close( $finfo );
+		}catch( \Exception $excep ) {
+			$mimeType = "none";
+		}
+
+		return $mimeType;
+	}
+
+	/**
 	 * Retornar todos os resultados da consulta.
-	 * @param  boolean $isApiRequest Identificar requisições para API.
 	 * @return array
 	 */
-	public function getAllResults( $isApiRequest = false ) {
+	public function getAllResults() {
 		$results = array();
 
-		while( $element = $this->getResults( $isApiRequest ) )
+		while( $element = $this->getResults() )
 			$results[] = $element;
 
-		# Converter dados para o formato definido em setDataType().
-		if( $this->dataType == "OBJECT" )
-			$results = (object) $results;
-		elseif( $this->dataType == "JSON" )
-			$results = json_encode( $results );
-
-		return $results;
+		return $this->getElement( $this->dataType, $results );
 	}
 }
