@@ -37,7 +37,7 @@ class Signin {
 				$header = self::base64UrlEncode( $header );
 				$payload = self::base64UrlEncode( $payload );
 
-				$sign = hash_hmac( "sha256", $header . "." . $payload, getenv( "OKTACLIENTSECRET" ), true );
+				$sign = hash_hmac( "sha256", $header . "." . $payload, OKTASECRET, true );
 				$sign = self::base64UrlEncode( $sign );
 				$token = $header . "." . $payload . "." . $sign;
 

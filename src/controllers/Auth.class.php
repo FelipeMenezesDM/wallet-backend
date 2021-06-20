@@ -24,8 +24,8 @@ class Auth {
 		if( isset( $_REQUEST[ "client_secret" ] ) )
 			$clientSecret = $_REQUEST[ "client_secret" ];
 
-		$scope = getenv( "OKTASCOPE" );
-		$issuer = getenv( "OKTAISSUER" );
+		$scope = OKTASCOPE;
+		$issuer = OKTAISSUER;
 
 		$uri = $issuer . "/v1/token";
 		$token = base64_encode( "$clientId:$clientSecret" );

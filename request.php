@@ -32,7 +32,7 @@ function apiRequest() {
 }
 endif;
 
-if( $apiRequest = apiRequest() ) {
+if( ACT_API && $apiRequest = apiRequest() ) {
 	new \Src\Controllers\Request( $apiRequest );
 	exit;
 }
