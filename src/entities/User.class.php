@@ -11,28 +11,28 @@
 namespace Src\Entities;
 
 class User extends Person {
-	const KEY_NAME = "user_id";
+	const KEY_NAME = "userId";
 
 	const JOINS = array(
 		array(
 			"table"			=> "person",
 			"type"			=> "inner",
-			"meta_query"	=> array( array( "key" => "user_person_id", "column" => "person_id" ) )
+			"meta_query"	=> array( array( "key" => "userPersonId", "column" => "personId" ) )
 		)
 	);
 
-	var $user_id;
+	var $userId;
 	var $username;
 	var $password;
-	var $user_person_id;
-	var $user_creation;
+	var $userPersonId;
+	var $userCreation;
 
 	public function setUserId( $userId ) {
-		$this->user_id = $userId;
+		$this->userId = $userId;
 	}
 
 	public function getUserId() {
-		return $this->user_id;
+		return $this->userId;
 	}
 
 	public function setUsername( $username ) {
@@ -52,19 +52,19 @@ class User extends Person {
 	}
 
 	public function setUserPersonId( $userIersonId ) {
-		$this->user_person_id = $userIersonId;
+		$this->userPersonId = $userIersonId;
 	}
 
 	public function getUserPersonId() {
-		return $this->user_person_id;
+		return $this->userPersonId;
 	}
 
 	public function setUserCreation( $userCreation ) {
-		$this->user_creation = $userCreation;
+		$this->userCreation = $userCreation;
 	}
 
 	public function getUserCreation() {
-		return $this->user_creation;
+		return $this->userCreation;
 	}
 
 	/**

@@ -214,8 +214,8 @@ abstract class Entity {
 	 * @return string
 	 */
 	public function getPropValue( $prop ) {
-		if( method_exists( $this, "get" . str_replace( "_", "", $prop ) ) ) {
-			return call_user_func( array( $this, "get" . str_replace( "_", "", $prop ) ) );
+		if( method_exists( $this, "get" . $prop ) ) {
+			return call_user_func( array( $this, "get" . $prop ) );
 		}
 
 		return null;
@@ -228,8 +228,8 @@ abstract class Entity {
 	 * @return string
 	 */
 	private function setPropValue( $prop, $value ) {
-		if( method_exists( $this, "set" . str_replace( "_", "", $prop ) ) ) {
-			call_user_func_array( array( $this, "set" . str_replace( "_", "", $prop ) ), array( $value ) );
+		if( method_exists( $this, "set" . $prop ) ) {
+			call_user_func_array( array( $this, "set" . $prop ), array( $value ) );
 		}
 	}
 

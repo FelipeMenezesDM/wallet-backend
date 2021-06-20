@@ -11,20 +11,20 @@
 namespace Src\Entities;
 
 class Payment extends Entity {
-	CONST KEY_NAME = "payment_id";
+	CONST KEY_NAME = "paymentId";
 
-	var $payment_id;
+	var $paymentId;
 	var $payer;
 	var $payee;
 	var $value;
-	var $payment_creation;
+	var $paymentCreation;
 
 	public function setPaymentId( $paymentId ) {
-		$this->payment_id = $paymentId;
+		$this->paymentId = $paymentId;
 	}
 
 	public function getPaymentId() {
-		return $this->payment_id;
+		return $this->paymentId;
 	}
 
 	public function setPayer( $payer ) {
@@ -52,10 +52,10 @@ class Payment extends Entity {
 	}
 
 	public function setPaymentCreation( $paymentCreation ) {
-		$this->payment_creation = $paymentCreation;
+		$this->paymentCreation = $paymentCreation;
 	}
 
 	public function getPaymentCreation() {
-		return $this->payment_creation;
+		return $this->paymentCreation;
 	}
 }

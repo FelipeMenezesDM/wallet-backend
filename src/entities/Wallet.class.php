@@ -11,38 +11,38 @@
 namespace Src\Entities;
 
 class Wallet extends Person {
-	CONST KEY_NAME = "wallet_id";
+	CONST KEY_NAME = "walletId";
 	CONST JOINS = array(
 		array(
 			"table" 		=> "person",
 			"meta_query" 	=> array(
 				array(
-					"key"		=> "wallet_person_id",
-					"column"	=> "person_id"
+					"key"		=> "walletPersonId",
+					"column"	=> "personId"
 				)
 			)
 		)
 	);
 
-	var $wallet_id;
-	var $wallet_person_id;
+	var $walletId;
+	var $walletPersonId;
 	var $balance;
-	var $wallet_creation;
+	var $walletCreation;
 
 	public function setWalletId( $walletId ) {
-		$this->wallet_id = $walletId;
+		$this->walletId = $walletId;
 	}
 
 	public function getWalletId() {
-		return $this->wallet_id;
+		return $this->walletId;
 	}
 
 	public function setWalletPersonId( $walletPersonId ) {
-		$this->wallet_person_id = $walletPersonId;
+		$this->walletPersonId = $walletPersonId;
 	}
 
 	public function getWalletPersonId() {
-		return $this->wallet_person_id;
+		return $this->walletPersonId;
 	}
 
 	public function setBalance( $balance ) {
@@ -54,11 +54,11 @@ class Wallet extends Person {
 	}
 
 	public function setWalletCreation( $walletCreation ) {
-		$this->wallet_creation = $walletCreation;
+		$this->walletCreation = $walletCreation;
 	}
 
 	public function getWalletCreation() {
-		return $this->wallet_creation;
+		return $this->walletCreation;
 	}
 
 	/**
@@ -67,6 +67,6 @@ class Wallet extends Person {
 	 * @return boolean
 	 */
 	public function getByPersonId( $personId ) {
-		return $this->get( array( "meta_query" => array( array( "key" => "wallet_person_id", "value" => $personId ) ) ) );
+		return $this->get( array( "meta_query" => array( array( "key" => "walletPersonId", "value" => $personId ) ) ) );
 	}
 }

@@ -11,21 +11,21 @@
 namespace Src\Entities;
 
 class Person extends Entity {
-	const KEY_NAME = "person_id";
+	const KEY_NAME = "personId";
 
-	var $person_id;
+	var $personId;
 	var $fullname;
 	var $email;
 	var $type;
-	var $cpf_cnpj;
-	var $person_creation;
+	var $cpfCnpj;
+	var $personCreation;
 
 	public function setPersonId( $personId ) {
-		$this->person_id = $personId;
+		$this->personId = $personId;
 	}
 
 	public function getPersonId() {
-		return $this->person_id;
+		return $this->personId;
 	}
 
 	public function setFullname( $fullname ) {
@@ -53,19 +53,19 @@ class Person extends Entity {
 	}
 
 	public function setCpfCnpj( $cpfCnpj ) {
-		$this->cpf_cnpj = $cpfCnpj;
+		$this->cpfCnpj = $cpfCnpj;
 	}
 
 	public function getCpfCnpj() {
-		return $this->cpf_cnpj;
+		return $this->cpfCnpj;
 	}
 
 	public function setPersonCreation( $personCreation ) {
-		$this->person_creation = $personCreation;
+		$this->personCreation = $personCreation;
 	}
 
 	public function getPersonCreation() {
-		return $this->person_creation;
+		return $this->personCreation;
 	}
 
 	/**
