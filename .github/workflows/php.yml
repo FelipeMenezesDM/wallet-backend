@@ -29,7 +29,7 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
     - name: PHPMD
-      uses: docker://jakzal/phpqa:php8.0-alpine
+      uses: docker://jakzal/phpqa
       with:
         args: phpmd app text cleancode,codesize,controversial,design,naming,unusedcode
 
