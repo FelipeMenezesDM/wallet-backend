@@ -29,9 +29,12 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
     - name: PHP Code Style (phpcs)
+      # You may pin to the exact commit or the version.
+      # uses: chindit/actions-phpcs@ccda708ed581ebe13a66497cc47c07b8346af3b3
       uses: chindit/actions-phpcs@1.0.1
       with:
-        dir: .
+        # Folder to check code style
+        dir: src
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
