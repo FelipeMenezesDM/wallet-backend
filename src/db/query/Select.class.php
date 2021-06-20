@@ -370,7 +370,7 @@ class Select extends \Src\Db\Controller {
 
 				# Tratamento de binários.
 				if( ( $this->isApi || $this->dataType == "JSON" ) && !empty( $value ) && preg_match( "/BYTEA/", $type ) ) {
-					$mineType = $this->getMimeType( $element[ ( $key ) ] );
+					$mimeType = $this->getMimeType( $element[ ( $key ) ] );
 					$element[ ( $key ) ] = "data:" . $mimeType . ";base64," . base64_encode( $element[ ( $key ) ] );
 				}
 			}

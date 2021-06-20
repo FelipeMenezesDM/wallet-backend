@@ -134,43 +134,88 @@ class Connect {
 	public function __construct( $database = null, $user = null, $password = null, $host = null, $port = null ) {
 		$this->logger = new Logger();
 
+		# Definir gerenciador da base de dados a partir de constante global.
+		if( is_null( self::$manager ) && defined( "DB_MANAGER" ) )
+			$this->setManager( DB_MANAGER );
+
+		# Definir schema.
+		$this->schema = $this->getDefaultDB( $database );
+		$this->database = $this->schema;
+		$this->user = $this->getDefaultDBUser( $user );
+		$this->password = $this->getDefaultDBPassword( $password );
+		$this->host = $host;
+		$this->port = $port;
+	}
+
+	/**
+	 * Obter base de dados padrão.
+	 * @param  string $database Nome da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDB( $database ) {
 		# Definir base de dados a partir de constante global.
 		if( is_null( $database ) && defined( "DB_NAME" ) )
 			$database = DB_NAME;
 
+		return $database;
+	}
+
+	/**
+	 * Obter o usuário padrão da base de dados.
+	 * @param  string $dbuser Usuário da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDBUser( $dbuser ) {
 		# Definir usuário da base de dados a partir de constante global.
 		if( is_null( $user ) && defined( "DB_USER" ) )
 			$user = DB_USER;
 
+		return $user;
+	}
+
+	/**
+	 * Obter senha padrão da base de dados.
+	 * @param  string $password Senha da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDBPassword( $password ) {
 		# Definir senha de usuário da base de dados a partir de constante global.
 		if( is_null( $password ) && defined( "DB_PASSWORD" ) && !empty( trim( DB_PASSWORD ) ) )
 			$password = DB_PASSWORD;
 		elseif( is_null( $password ) )
 			$password  = "";
 
+		return $password;
+	}
+
+	/**
+	 * Obter servidor padrão da base de dados.
+	 * @param  string $host Servidor da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDBHost( $host ) {
 		# Definir endereço do servidor de base de dados a partir de constante global.
 		if( is_null( $host ) && defined( "DB_HOST" ) && !empty( trim( DB_HOST ) ) )
 			$host = DB_HOST;
 		elseif( is_null( $host ) || empty( trim( $host ) ) )
 			$host = "localhost";
 
+		return $host;
+	}
+
+	/**
+	 * Obter a porta padrão di servidor da base de dados.
+	 * @param  string $port Porta do servidor da base de dados.
+	 * @return string
+	 */
+	private function getDefaultDBHostPort( $port ) {
 		# Definir porta do servidor de base de dados a partir de constante global.
 		if( is_null( $port ) && defined( "DB_PORT" ) && !empty( trim( DB_PORT ) ) )
 			$port = DB_PORT;
 		elseif( empty( trim( $port ) ) )
 			$port = NULL;
 
-		# Definir gerenciador da base de dados a partir de constante global.
-		if( is_null( self::$manager ) && defined( "DB_MANAGER" ) )
-			$this->setManager( DB_MANAGER );
-
-		# Definir schema.
-		$this->schema = $database;
-		$this->database = $database;
-		$this->user = $user;
-		$this->password = $password;
-		$this->host = $host;
-		$this->port = $port;
+		return $port;
 	}
 
 	/**
