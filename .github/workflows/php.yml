@@ -2,7 +2,7 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main ]
   pull_request:
     branches: [ main, dev ]
 
@@ -31,7 +31,7 @@ jobs:
     - name: PHPMD
       uses: docker://jakzal/phpqa:php7.4-alpine
       with:
-        args: phpmd app text cleancode,codesize,controversial,design,naming,unusedcode
+        args: phpmd text cleancode,codesize,controversial,design,naming,unusedcode
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
