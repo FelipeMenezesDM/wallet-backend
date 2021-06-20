@@ -27,8 +27,8 @@ class User extends Person {
 	var $user_person_id;
 	var $user_creation;
 
-	public function setUserId( $user_id ) {
-		$this->user_id = $user_id;
+	public function setUserId( $userId ) {
+		$this->user_id = $userId;
 	}
 
 	public function getUserId() {
@@ -51,16 +51,16 @@ class User extends Person {
 		return $this->password;
 	}
 
-	public function setUserPersonId( $user_person_id ) {
-		$this->user_person_id = $user_person_id;
+	public function setUserPersonId( $userIersonId ) {
+		$this->user_person_id = $userIersonId;
 	}
 
 	public function getUserPersonId() {
 		return $this->user_person_id;
 	}
 
-	public function setUserCreation( $user_creation ) {
-		$this->user_creation = $user_creation;
+	public function setUserCreation( $userCreation ) {
+		$this->user_creation = $userCreation;
 	}
 
 	public function getUserCreation() {

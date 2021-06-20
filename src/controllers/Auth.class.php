@@ -13,16 +13,17 @@ namespace Src\Controllers;
 class Auth {
 	/**
 	 * Verifica se as credenciais são válidas.
+	 * @param  arrau   $request Objeto da requisição.
 	 * @return boolean
 	 */
-	public static function isAuth() {
+	public function isAuth( $request ) {
 		$clientSecret = $clientId = "";
 
-		if( isset( $_REQUEST[ "client_id" ] ) )
-			$clientId = $_REQUEST[ "client_id" ];
+		if( isset( $request[ "client_id" ] ) )
+			$clientId = $request[ "client_id" ];
 
-		if( isset( $_REQUEST[ "client_secret" ] ) )
-			$clientSecret = $_REQUEST[ "client_secret" ];
+		if( isset( $request[ "client_secret" ] ) )
+			$clientSecret = $request[ "client_secret" ];
 
 		$scope = OKTASCOPE;
 		$issuer = OKTAISSUER;
@@ -31,17 +32,17 @@ class Auth {
 		$token = base64_encode( "$clientId:$clientSecret" );
 		$payload = http_build_query([ "grant_type" => "client_credentials", "scope" => $scope ]);
 
-		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, $uri );
-		curl_setopt( $ch, CURLOPT_HTTPHEADER, [
+		$curCh = curl_init();
+		curl_setopt( $curCh, CURLOPT_URL, $uri );
+		curl_setopt( $curCh, CURLOPT_HTTPHEADER, [
 			"Content-Type: application/x-www-form-urlencoded",
 			"Authorization: Basic $token"
 		]);
-		curl_setopt( $ch, CURLOPT_POST, 1 );
-		curl_setopt( $ch, CURLOPT_POSTFIELDS, $payload );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $curCh, CURLOPT_POST, 1 );
+		curl_setopt( $curCh, CURLOPT_POSTFIELDS, $payload );
+		curl_setopt( $curCh, CURLOPT_RETURNTRANSFER, true );
 
-		$response = curl_exec($ch);
+		$response = curl_exec($curCh);
 		$response = json_decode($response, true);
 
 		if( !isset($response[ "access_token" ] ) || !isset( $response[ "token_type" ] ) )

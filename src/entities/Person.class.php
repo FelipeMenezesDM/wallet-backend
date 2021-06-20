@@ -20,8 +20,8 @@ class Person extends Entity {
 	var $cpf_cnpj;
 	var $person_creation;
 
-	public function setPersonId( $person_id ) {
-		$this->person_id = $person_id;
+	public function setPersonId( $personId ) {
+		$this->person_id = $personId;
 	}
 
 	public function getPersonId() {
@@ -52,16 +52,16 @@ class Person extends Entity {
 		return $this->type;
 	}
 
-	public function setCpfCnpj( $cpf_cnpj ) {
-		$this->cpf_cnpj = $cpf_cnpj;
+	public function setCpfCnpj( $cpfCnpj ) {
+		$this->cpf_cnpj = $cpfCnpj;
 	}
 
 	public function getCpfCnpj() {
 		return $this->cpf_cnpj;
 	}
 
-	public function setPersonCreation( $person_creation ) {
-		$this->person_creation = $person_creation;
+	public function setPersonCreation( $personCreation ) {
+		$this->person_creation = $personCreation;
 	}
 
 	public function getPersonCreation() {

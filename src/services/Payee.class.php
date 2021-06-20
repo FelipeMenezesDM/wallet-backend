@@ -9,6 +9,7 @@
  */
 
 namespace Src\Services;
+use \Src\Db\Query as Query;
 
 class Payee {
  	/**
@@ -18,7 +19,7 @@ class Payee {
 	 */
 	public function getPayees( $request ) {
 		try{
-			$query = new \Src\Db\query\Select( array(
+			$query = new Query\Select( array(
 				"table"			=> "person",
 				"key"			=> "person_id",
 				"fields"		=> array( "person_id", "fullname", "username" ),
@@ -32,7 +33,7 @@ class Payee {
 				$list = array();
 			else
 				$list = $query->getAllResults();
-		}catch(\Exception $e) {
+		}catch( \Exception $e ) {
 			$list = array();
 		}
 
