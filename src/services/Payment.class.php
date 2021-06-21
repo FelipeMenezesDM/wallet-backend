@@ -92,7 +92,7 @@ class Payment {
 	private function validateUserData( $payer, $payee, $value ) {
 		$error = false;
 
-		if( $value === 0 ) {
+		if( $value <= 0 ) {
 			$error = gettext( "O valor de pagamento informado é inválido." );
 		}elseif( !$payer->getWalletPersonId() ) {
 			$error = gettext( "O usuário pagador é inválido." );

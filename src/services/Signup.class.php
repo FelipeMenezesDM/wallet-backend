@@ -57,7 +57,7 @@ class Signup extends Signin {
 		$wallet = new Wallet();
 		$wallet->setWalletId( $this->getUuid() );
 		$wallet->setWalletPersonId( $person->getPersonId() );
-		$wallet->setBalance(0);
+		$wallet->setBalance(20);
 		$wallet->post();
 
 		if( !( $person->hasError() || $user->hasError() || $wallet->hasError() ) )

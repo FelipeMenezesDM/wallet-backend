@@ -11,6 +11,7 @@
 spl_autoload_register( function( $class ) {
 	# Definir pacote da classe.
 	$path = __DIR__ . str_replace( array( "/", "\\" ), DIRECTORY_SEPARATOR, "/" . $class );
+	$path = strtolower( dirname( $path ) ) . DIRECTORY_SEPARATOR . basename( $path );
 
 	if( file_exists( $path . ".class.php" ) )
 		require_once( $path . ".class.php" );
