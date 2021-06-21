@@ -227,7 +227,7 @@ class Connect {
 		# Definir gerenciador apenas quando este não houver sido definido anteriormente.
 		if( is_null( self::$manager ) ) {
 			$manager = strtolower( trim( $manager ) );
-			$driver = "Src\Drivers\Driver${manager}";
+			$driver = "Src\Drivers\Driver" . ucfirst( $manager );
 
 			# Verificar se o gerenciador foi definido.
 			if( empty( $manager ) )

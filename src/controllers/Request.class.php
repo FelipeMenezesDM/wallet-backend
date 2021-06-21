@@ -231,7 +231,7 @@ class Request {
 			break;
 			case "service" : # Requisição de serviços.
 				try{ 
-					$service = "Src\Services\\" . $this->requestParams[ "object" ];
+					$service = "Src\Services\\" . ucfirst( $this->requestParams[ "object" ] );
 					$service = new $service();
 					$feature = $this->requestParams[ "feature" ];
 					$this->response = call_user_func_array( array( $service, $feature ), array( $request ) );
