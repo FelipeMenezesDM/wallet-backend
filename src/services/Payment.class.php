@@ -44,13 +44,8 @@ class Payment {
 			return $this->response;
 		}
 
-		try{
-			$value = (float) $this->handlerPaymentValue( $request[ "value" ] );
-		}catch( \Exception $e ) {
-			$this->response[ "message" ] = gettext( "O valor informado está em um formato inválido." );;
-			return $this->resonse;
-		}
-
+		$value = (float) $request[ "value" ];
+		
 		$conn = new Db\Connect();
 		$conn->connect();
 		$conn->setAutocommit( false );
