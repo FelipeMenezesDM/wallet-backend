@@ -22,11 +22,12 @@ class Payee {
 			$query = new Query\Select( array(
 				"table"			=> "person",
 				"key"			=> "personId",
-				"fields"		=> array( "personId", "fullname", "username" ),
+				"fields"		=> array( "personId", "fullname", "username", "type" ),
 				"joins"			=> array(
 					array( "table" => "user", "meta_query" => array( array( "key" => "userPersonId", "column" => "personId" ) ) )
 				),
-				"meta_query"	=> array( array( "key" => "personId", "compare" => "!=", "value" => $request[ "personid" ] ) )
+				"meta_query"	=> array( array( "key" => "personId", "compare" => "!=", "value" => $request[ "personid" ] ) ),
+				"order_by" 		=> "fullname"
 			));
 
 			if( $query->hasError() )
