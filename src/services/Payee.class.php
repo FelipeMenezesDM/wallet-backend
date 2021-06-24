@@ -27,7 +27,7 @@ class Payee {
 					array( "table" => "user", "meta_query" => array( array( "key" => "userPersonId", "column" => "personId" ) ) )
 				),
 				"meta_query"	=> array( array( "key" => "personId", "compare" => "!=", "value" => $request[ "personid" ] ) ),
-				"order_by" 		=> "fullname"
+				"order_by" 		=> "fullname desc"
 			));
 
 			if( $query->hasError() )
