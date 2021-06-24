@@ -92,11 +92,11 @@ class Payment {
 		}elseif( !$payer->getWalletPersonId() ) {
 			$error = gettext( "O usuário pagador é inválido." );
 		}elseif( !$payee->getWalletPersonId() ) {
-			$error = gettext( "O usuário receber selecionado é inválido." );
+			$error = gettext( "O usuário recebedor selecionado é inválido." );
 		}elseif( $payer->getType() !== "F" ) {
 			$error = gettext( "Essa ação não é permitida para o seu tipo de usuário." );
 		}elseif( $payer->getBalance() < $value ) {
-			$error = gettext( "Não há saldo sufiente para esta operação." );
+			$error = gettext( "Não há saldo suficiente para esta operação." );
 		}elseif( $payer->getWalletPersonId() === $payee->getWalletPersonId() ) {
 			$error = gettext( "Este tipo de operação é inválida." );
 		}
